@@ -55,3 +55,11 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Rider/IDE local configuration
+.idea/
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
