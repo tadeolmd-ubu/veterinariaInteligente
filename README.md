@@ -1,10 +1,10 @@
 # veterinariaInteligente
 
-Aplicación de escritorio para la gestión de una veterinaria usando Avalonia, .NET 8, Entity Framework Core 8 con SQLite y CommunityToolkit.Mvvm.
+Aplicación de escritorio para la gestión de una veterinaria usando Avalonia, .NET 10, Entity Framework Core 8 con SQLite y CommunityToolkit.Mvvm.
 
 ## Requisitos
 
-- SDK de .NET 8 (https://dotnet.microsoft.com/download/dotnet/8.0)
+- SDK de .NET 10 (https://dotnet.microsoft.com/download/dotnet/10.0)
 
 ## Clonar el repositorio
 
