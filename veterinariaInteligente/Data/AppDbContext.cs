@@ -6,6 +6,7 @@ namespace veterinariaInteligente.Data;
 public class AppDbContext : DbContext
 {
     public DbSet<Duenio> Duenios => Set<Duenio>();
+    public DbSet<Profesional> Profesionales => Set<Profesional>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -25,6 +26,18 @@ public class AppDbContext : DbContext
 
             e.HasIndex(x => x.Nombre);
             e.HasIndex(x => x.Telefono);
+        });
+        modelBuilder.Entity<Profesional>(e =>
+        {
+            e.ToTable("Profesional");
+            e.HasKey(x => x.Id);
+            
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Nombre).HasColumnName("nombre").HasMaxLength(255).IsRequired();
+            e.Property(x => x.Cedula).HasColumnName("cedula").HasMaxLength(255);
+            e.Property(x => x.Activo).HasColumnName("activo");
+            
+            e.HasIndex(x => x.Nombre);
         });
     }
 }
