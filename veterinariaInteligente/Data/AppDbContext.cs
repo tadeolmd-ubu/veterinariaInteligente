@@ -39,5 +39,13 @@ public class AppDbContext : DbContext
             
             e.HasIndex(x => x.Nombre);
         });
+        modelBuilder.Entity<MascotaEstado>(e =>
+        {
+            e.ToTable("MascotaEstado");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Nombre).HasColumnName("nombre").HasMaxLength(100).IsRequired();
+        });
     }
 }
