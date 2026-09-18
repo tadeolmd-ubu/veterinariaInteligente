@@ -10,4 +10,7 @@ public class Duenio
     public string? Correo { get; set; } = string.Empty;
     public string? Direccion { get; set; } = string.Empty;
     public DateOnly? FechaArchivado { get; set; }
+    
+    public ICollection<Mascota> Mascotas { get; set; } = [];
+    public ICollection<Cita> Citas { get; set; } = [];
 }
