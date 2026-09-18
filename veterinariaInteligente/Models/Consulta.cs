@@ -20,4 +20,6 @@ public class Consulta
     
     public DateTime FechaCreacion  { get; set; }
     public DateTime FechaModificacion { get; set; }
+    
+    public ICollection<ConsultaVersion> Versiones { get; set; } = []; 
 }

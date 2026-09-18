@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
     public DbSet<Profesional> Profesionales => Set<Profesional>();
     public DbSet<Mascota> Mascotas => Set<Mascota>();
     public DbSet<Consulta> Consultas => Set<Consulta>();
+    public DbSet<ConsultaVersion> ConsultaVersiones => Set<ConsultaVersion>();
     
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
@@ -98,6 +99,27 @@ public class AppDbContext : DbContext
                 .HasForeignKey(x => x.IdMascota);
             e.Property(x => x.FechaCreacion).HasColumnName("fechaCreacion").IsRequired();
             e.Property(x => x.FechaModificacion).HasColumnName("fechaModificacion").IsRequired();
+        });
+        modelBuilder.Entity<ConsultaVersion>(e =>
+        {
+            e.ToTable("ConsultaVersion");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Fecha).HasColumnName("fecha").HasColumnType("datetime").IsRequired();
+            e.Property(x => x.Campo).HasColumnName("campo").HasMaxLength(100).IsRequired();
+            e.Property(x => x.ValorAnterior).HasColumnName("valorAnterior").HasMaxLength(500);
+            e.Property(x => x.ValorNuevo).HasColumnName("valorNuevo").HasMaxLength(500);
+            
+            e.Property(x => x.IdConsulta).HasColumnName("idConsulta");
+            e.HasOne(x => x.Consulta)
+                .WithMany(c => c.Versiones)     
+                .HasForeignKey(x => x.IdConsulta);
+
+            e.Property(x => x.IdProfesional).HasColumnName("idProfesional");
+            e.HasOne(x => x.Profesional)
+                .WithMany()                      
+                .HasForeignKey(x => x.IdProfesional);
         });
     }
 }
