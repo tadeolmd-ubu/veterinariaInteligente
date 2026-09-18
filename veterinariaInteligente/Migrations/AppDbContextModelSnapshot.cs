@@ -17,6 +17,251 @@ namespace veterinariaInteligente.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
+            modelBuilder.Entity("veterinariaInteligente.Models.AplicacionVacuna", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<DateOnly>("FechaAplicacion")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaAplicacion");
+
+                    b.Property<DateOnly?>("FechaProximaSugerida")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaProximaSugerida");
+
+                    b.Property<int>("IdMascota")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idMascota");
+
+                    b.Property<int?>("IdProfesional")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idProfesional");
+
+                    b.Property<int>("IdVacuna")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idVacuna");
+
+                    b.Property<string>("Lote")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("lote");
+
+                    b.Property<string>("Observacion")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("observacion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdMascota");
+
+                    b.HasIndex("IdProfesional");
+
+                    b.HasIndex("IdVacuna");
+
+                    b.ToTable("AplicacionVacuna", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Cita", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("estado");
+
+                    b.Property<DateTime>("FechaPrevista")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaPrevista");
+
+                    b.Property<int?>("IdDuenio")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idDuenio");
+
+                    b.Property<int?>("IdMascota")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idMascota");
+
+                    b.Property<int?>("IdProfesional")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idProfesional");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("motivo");
+
+                    b.Property<string>("Notas")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notas");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdDuenio");
+
+                    b.HasIndex("IdMascota");
+
+                    b.HasIndex("IdProfesional");
+
+                    b.ToTable("Cita", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.ConfiguracionCliente", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("direccion");
+
+                    b.Property<int?>("IdProfesionalDefault")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idProfesionalDefault");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("telefono");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdProfesionalDefault");
+
+                    b.ToTable("ConfiguracionCliente", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Consulta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Diagnostico")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("diagnostico");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("estado");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaCreacion");
+
+                    b.Property<DateTime>("FechaModificacion")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaModificacion");
+
+                    b.Property<int>("IdMascota")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idMascota");
+
+                    b.Property<int>("IdProfesional")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idProfesional");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("motivo");
+
+                    b.Property<string>("Observacion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("observacion");
+
+                    b.Property<decimal?>("Peso")
+                        .HasColumnType("decimal(5,3)")
+                        .HasColumnName("peso");
+
+                    b.Property<string>("Tratamiento")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("tratamiento");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdMascota");
+
+                    b.HasIndex("IdProfesional");
+
+                    b.ToTable("Consulta", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.ConsultaVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Campo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("campo");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime")
+                        .HasColumnName("fecha");
+
+                    b.Property<int>("IdConsulta")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idConsulta");
+
+                    b.Property<int>("IdProfesional")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idProfesional");
+
+                    b.Property<string>("ValorAnterior")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("valorAnterior");
+
+                    b.Property<string>("ValorNuevo")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("valorNuevo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdConsulta");
+
+                    b.HasIndex("IdProfesional");
+
+                    b.ToTable("ConsultaVersion", (string)null);
+                });
+
             modelBuilder.Entity("veterinariaInteligente.Models.Duenio", b =>
                 {
                     b.Property<int>("Id")
@@ -57,6 +302,396 @@ namespace veterinariaInteligente.Migrations
                     b.HasIndex("Telefono");
 
                     b.ToTable("Duenio", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Mascota", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Alergia")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("alergia");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("color");
+
+                    b.Property<DateOnly?>("FechaArchivado")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaArchivado");
+
+                    b.Property<DateOnly?>("FechaNacimiento")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaNacimiento");
+
+                    b.Property<int>("IdDuenio")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idDuenio");
+
+                    b.Property<int>("IdEstado")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idEstado");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("Raza")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("raza");
+
+                    b.Property<string>("Sexo")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("sexo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdDuenio");
+
+                    b.HasIndex("IdEstado");
+
+                    b.ToTable("Mascota", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.MascotaEstado", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MascotaEstado", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Profesional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Activo")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("activo");
+
+                    b.Property<string>("Cedula")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("cedula");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre");
+
+                    b.ToTable("Profesional", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Seguimiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("estado");
+
+                    b.Property<DateOnly>("FechaPrevista")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaPrevista");
+
+                    b.Property<DateOnly?>("FechaRealizada")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("fechaRealizada");
+
+                    b.Property<int?>("IdAplicacionVacunaOrigen")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idAplicacionVacunaOrigen");
+
+                    b.Property<int?>("IdConsultaOrigen")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idConsultaOrigen");
+
+                    b.Property<int?>("IdConsultaRealizacion")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idConsultaRealizacion");
+
+                    b.Property<int>("IdMascota")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("idMascota");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("motivo");
+
+                    b.Property<string>("Notas")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notas");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdAplicacionVacunaOrigen");
+
+                    b.HasIndex("IdConsultaOrigen");
+
+                    b.HasIndex("IdConsultaRealizacion");
+
+                    b.HasIndex("IdMascota");
+
+                    b.ToTable("Seguimiento", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Vacuna", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Activo")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("activo");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("descripcion");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nombre");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre");
+
+                    b.ToTable("Vacuna", (string)null);
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.AplicacionVacuna", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.Mascota", "Mascota")
+                        .WithMany("AplicacionesVacunas")
+                        .HasForeignKey("IdMascota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("veterinariaInteligente.Models.Profesional", "Profesional")
+                        .WithMany("AplicacionesVacunas")
+                        .HasForeignKey("IdProfesional");
+
+                    b.HasOne("veterinariaInteligente.Models.Vacuna", "Vacuna")
+                        .WithMany("Aplicaciones")
+                        .HasForeignKey("IdVacuna")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mascota");
+
+                    b.Navigation("Profesional");
+
+                    b.Navigation("Vacuna");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Cita", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.Duenio", "Duenio")
+                        .WithMany("Citas")
+                        .HasForeignKey("IdDuenio");
+
+                    b.HasOne("veterinariaInteligente.Models.Mascota", "Mascota")
+                        .WithMany("Citas")
+                        .HasForeignKey("IdMascota");
+
+                    b.HasOne("veterinariaInteligente.Models.Profesional", "Profesional")
+                        .WithMany("Citas")
+                        .HasForeignKey("IdProfesional");
+
+                    b.Navigation("Duenio");
+
+                    b.Navigation("Mascota");
+
+                    b.Navigation("Profesional");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.ConfiguracionCliente", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.Profesional", "ProfesionalDefault")
+                        .WithMany()
+                        .HasForeignKey("IdProfesionalDefault");
+
+                    b.Navigation("ProfesionalDefault");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Consulta", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.Mascota", "Mascota")
+                        .WithMany("Consultas")
+                        .HasForeignKey("IdMascota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("veterinariaInteligente.Models.Profesional", "Profesional")
+                        .WithMany("Consultas")
+                        .HasForeignKey("IdProfesional")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mascota");
+
+                    b.Navigation("Profesional");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.ConsultaVersion", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.Consulta", "Consulta")
+                        .WithMany("Versiones")
+                        .HasForeignKey("IdConsulta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("veterinariaInteligente.Models.Profesional", "Profesional")
+                        .WithMany()
+                        .HasForeignKey("IdProfesional")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consulta");
+
+                    b.Navigation("Profesional");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Mascota", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.Duenio", "Duenio")
+                        .WithMany("Mascotas")
+                        .HasForeignKey("IdDuenio")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("veterinariaInteligente.Models.MascotaEstado", "Estado")
+                        .WithMany("Mascotas")
+                        .HasForeignKey("IdEstado")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Duenio");
+
+                    b.Navigation("Estado");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Seguimiento", b =>
+                {
+                    b.HasOne("veterinariaInteligente.Models.AplicacionVacuna", "AplicacionVacunaOrigen")
+                        .WithMany("SeguimientosOriginados")
+                        .HasForeignKey("IdAplicacionVacunaOrigen");
+
+                    b.HasOne("veterinariaInteligente.Models.Consulta", "ConsultaOrigen")
+                        .WithMany("SeguimientosOriginados")
+                        .HasForeignKey("IdConsultaOrigen");
+
+                    b.HasOne("veterinariaInteligente.Models.Consulta", "ConsultaRealizacion")
+                        .WithMany("SeguimientosRealizados")
+                        .HasForeignKey("IdConsultaRealizacion");
+
+                    b.HasOne("veterinariaInteligente.Models.Mascota", "Mascota")
+                        .WithMany("Seguimientos")
+                        .HasForeignKey("IdMascota")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AplicacionVacunaOrigen");
+
+                    b.Navigation("ConsultaOrigen");
+
+                    b.Navigation("ConsultaRealizacion");
+
+                    b.Navigation("Mascota");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.AplicacionVacuna", b =>
+                {
+                    b.Navigation("SeguimientosOriginados");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Consulta", b =>
+                {
+                    b.Navigation("SeguimientosOriginados");
+
+                    b.Navigation("SeguimientosRealizados");
+
+                    b.Navigation("Versiones");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Duenio", b =>
+                {
+                    b.Navigation("Citas");
+
+                    b.Navigation("Mascotas");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Mascota", b =>
+                {
+                    b.Navigation("AplicacionesVacunas");
+
+                    b.Navigation("Citas");
+
+                    b.Navigation("Consultas");
+
+                    b.Navigation("Seguimientos");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.MascotaEstado", b =>
+                {
+                    b.Navigation("Mascotas");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Profesional", b =>
+                {
+                    b.Navigation("AplicacionesVacunas");
+
+                    b.Navigation("Citas");
+
+                    b.Navigation("Consultas");
+                });
+
+            modelBuilder.Entity("veterinariaInteligente.Models.Vacuna", b =>
+                {
+                    b.Navigation("Aplicaciones");
                 });
 #pragma warning restore 612, 618
         }
