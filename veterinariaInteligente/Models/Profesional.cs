@@ -7,5 +7,6 @@ public class Profesional
     public string? Cedula { get; set; } = string.Empty;
     public int Activo { get; set; }
     
+    public ICollection<Consulta> Consultas { get; set; } = [];
     
 }
