@@ -17,4 +17,5 @@ public class AplicacionVacuna
     public int? IdProfesional { get; set; }
     public Profesional? Profesional { get; set; }
 
+    public ICollection<Seguimiento> SeguimientosOriginados { get; set; } = [];
 }

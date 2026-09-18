@@ -22,4 +22,7 @@ public class Consulta
     public DateTime FechaModificacion { get; set; }
     
     public ICollection<ConsultaVersion> Versiones { get; set; } = []; 
+    
+    public ICollection<Seguimiento> SeguimientosOriginados { get; set; } = [];
+    public ICollection<Seguimiento> SeguimientosRealizados { get; set; } = [];
 }

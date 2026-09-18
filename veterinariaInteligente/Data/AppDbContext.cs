@@ -13,6 +13,8 @@ public class AppDbContext : DbContext
     public DbSet<Vacuna> Vacunas => Set<Vacuna>();
     public DbSet<AplicacionVacuna> AplicacionVacunas => Set<AplicacionVacuna>();
     
+    public DbSet<Seguimiento> Seguimientos => Set<Seguimiento>();
+    
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -129,13 +131,9 @@ public class AppDbContext : DbContext
             e.HasKey(x => x.Id);
 
             e.Property(x => x.Id).HasColumnName("id");
-
             e.Property(x => x.Nombre).HasColumnName("nombre").HasMaxLength(100).IsRequired();
-
             e.Property(x => x.Descripcion).HasColumnName("descripcion").HasMaxLength(255);
-
             e.Property(x => x.Activo).HasColumnName("activo");
-
             e.HasIndex(x => x.Nombre);
         });
         modelBuilder.Entity<AplicacionVacuna>(e =>
@@ -143,44 +141,60 @@ public class AppDbContext : DbContext
             e.ToTable("VacunaAplicacion");
             e.HasKey(x => x.Id);
 
-            e.Property(x => x.Id)
-                .HasColumnName("id");
-
-            e.Property(x => x.FechaAplicacion)
-                .HasColumnName("fechaAplicacion")
-                .IsRequired();
-
-            e.Property(x => x.Lote)
-                .HasColumnName("lote")
-                .HasMaxLength(20);
-
-            e.Property(x => x.Observacion)
-                .HasColumnName("observacion")
-                .HasMaxLength(255);
-
-            e.Property(x => x.FechaProximaSugerida)
-                .HasColumnName("fechaProximaSugerida");
-
-            e.Property(x => x.IdVacuna)
-                .HasColumnName("idVacuna");
-
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.FechaAplicacion).HasColumnName("fechaAplicacion").IsRequired();
+            e.Property(x => x.Lote).HasColumnName("lote").HasMaxLength(20);
+            e.Property(x => x.Observacion).HasColumnName("observacion").HasMaxLength(255);
+            e.Property(x => x.FechaProximaSugerida).HasColumnName("fechaProximaSugerida");
+            
+            e.Property(x => x.IdVacuna).HasColumnName("idVacuna");
             e.HasOne(x => x.Vacuna)
                 .WithMany(v => v.Aplicaciones)
                 .HasForeignKey(x => x.IdVacuna);
 
-            e.Property(x => x.IdMascota)
-                .HasColumnName("idMascota");
+            e.Property(x => x.IdMascota).HasColumnName("idMascota");
 
             e.HasOne(x => x.Mascota)
                 .WithMany(m => m.AplicacionesVacunas)
                 .HasForeignKey(x => x.IdMascota);
 
-            e.Property(x => x.IdProfesional)
-                .HasColumnName("idProfesional");
+            e.Property(x => x.IdProfesional).HasColumnName("idProfesional");
 
             e.HasOne(x => x.Profesional)
                 .WithMany(p => p.AplicacionesVacunas)
                 .HasForeignKey(x => x.IdProfesional);
+        });
+        modelBuilder.Entity<Seguimiento>(e =>
+        {
+            e.ToTable("Seguimiento");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Motivo).HasColumnName("motivo").HasMaxLength(100).IsRequired();
+            e.Property(x => x.FechaPrevista).HasColumnName("fechaPrevista").IsRequired();
+            e.Property(x => x.FechaRealizada).HasColumnName("fechaRealizada");
+            e.Property(x => x.Notas).HasColumnName("notas").HasMaxLength(255);
+            e.Property(x => x.Estado).HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
+            
+            e.Property(x => x.IdMascota).HasColumnName("idMascota");
+            e.HasOne(x => x.Mascota)
+                .WithMany(m => m.Seguimientos)
+                .HasForeignKey(x => x.IdMascota);
+
+            e.Property(x => x.IdConsultaOrigen).HasColumnName("idConsultaOrigen");
+            e.HasOne(x => x.ConsultaOrigen)
+                .WithMany(c => c.SeguimientosOriginados)
+                .HasForeignKey(x => x.IdConsultaOrigen);
+
+            e.Property(x => x.IdAplicacionVacunaOrigen).HasColumnName("idAplicacionVacunaOrigen");
+            e.HasOne(x => x.AplicacionVacunaOrigen)
+                .WithMany(v => v.SeguimientosOriginados)
+                .HasForeignKey(x => x.IdAplicacionVacunaOrigen);
+
+            e.Property(x => x.IdConsultaRealizacion).HasColumnName("idConsultaRealizacion");
+            e.HasOne(x => x.ConsultaRealizacion)
+                .WithMany(c => c.SeguimientosRealizados)
+                .HasForeignKey(x => x.IdConsultaRealizacion);
         });
     }
 }
