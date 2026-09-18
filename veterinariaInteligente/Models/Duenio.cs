@@ -12,4 +12,5 @@ public class Duenio
     public DateOnly? FechaArchivado { get; set; }
     
     public ICollection<Mascota> Mascotas { get; set; } = [];
+    public ICollection<Cita> Citas { get; set; } = [];
 }

@@ -12,9 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<ConsultaVersion> ConsultaVersiones => Set<ConsultaVersion>();
     public DbSet<Vacuna> Vacunas => Set<Vacuna>();
     public DbSet<AplicacionVacuna> AplicacionVacunas => Set<AplicacionVacuna>();
-    
     public DbSet<Seguimiento> Seguimientos => Set<Seguimiento>();
-    
+    public DbSet<Cita> Citas => Set<Cita>();
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -71,12 +70,12 @@ public class AppDbContext : DbContext
 
             e.Property(x => x.IdDuenio).HasColumnName("idDuenio");
             e.HasOne(x => x.Duenio)
-                .WithMany(d => d.Mascotas)          // colección inversa en Duenio
+                .WithMany(d => d.Mascotas)          
                 .HasForeignKey(x => x.IdDuenio);
 
             e.Property(x => x.IdEstado).HasColumnName("idEstado");
             e.HasOne(x => x.Estado)
-                .WithMany(m => m.Mascotas)          // colección inversa en MascotaEstado
+                .WithMany(m => m.Mascotas)          
                 .HasForeignKey(x => x.IdEstado);
         });
         modelBuilder.Entity<Consulta>(e =>
@@ -195,6 +194,32 @@ public class AppDbContext : DbContext
             e.HasOne(x => x.ConsultaRealizacion)
                 .WithMany(c => c.SeguimientosRealizados)
                 .HasForeignKey(x => x.IdConsultaRealizacion);
+        });
+        modelBuilder.Entity<Cita>(e =>
+        {
+            e.ToTable("Cita");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.FechaPrevista).HasColumnName("fechaPrevista").IsRequired();
+            e.Property(x => x.Motivo).HasColumnName("motivo").HasMaxLength(100).IsRequired();
+            e.Property(x => x.Notas).HasColumnName("notas").HasMaxLength(255);
+            e.Property(x => x.Estado).HasColumnName("estado").HasConversion<string>().HasMaxLength(20).IsRequired();
+            
+            e.Property(x => x.IdMascota).HasColumnName("idMascota");
+            e.HasOne(x => x.Mascota)
+                .WithMany(m => m.Citas)
+                .HasForeignKey(x => x.IdMascota);
+
+            e.Property(x => x.IdDuenio).HasColumnName("idDuenio");
+            e.HasOne(x => x.Duenio)
+                .WithMany(d => d.Citas)
+                .HasForeignKey(x => x.IdDuenio);
+
+            e.Property(x => x.IdProfesional).HasColumnName("idProfesional");
+            e.HasOne(x => x.Profesional)
+                .WithMany(p => p.Citas)
+                .HasForeignKey(x => x.IdProfesional);
         });
     }
 }

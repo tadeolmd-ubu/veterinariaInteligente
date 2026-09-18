@@ -21,7 +21,7 @@ public class Mascota
     
     public ICollection<Consulta> Consultas { get; set; } = [];
     public ICollection<AplicacionVacuna> AplicacionesVacunas { get; set; } = [];
-    
     public ICollection<Seguimiento> Seguimientos { get; set; } = [];
+    public ICollection<Cita> Citas { get; set; } = [];
     
 }

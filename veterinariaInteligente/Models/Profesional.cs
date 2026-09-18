@@ -9,5 +9,6 @@ public class Profesional
     
     public ICollection<Consulta> Consultas { get; set; } = [];
     public ICollection<AplicacionVacuna> AplicacionesVacunas { get; set; } = [];
+    public ICollection<Cita> Citas { get; set; } = [];
     
 }
