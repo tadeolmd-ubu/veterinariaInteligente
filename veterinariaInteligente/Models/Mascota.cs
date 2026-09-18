@@ -12,10 +12,10 @@ public class Mascota
     public DateOnly? FechaArchivado  { get; set; }
     
     public int IdDuenio { get; set; }
-    public Duenio Duenio { get; set; }
+    public Duenio Duenio { get; set; } = null!;
 
     public int IdEstado { get; set; }
-    public MascotaEstado Estado { get; set; }
+    public MascotaEstado Estado { get; set; } = null!;
     
     public ICollection<Consulta> Consultas { get; set; } = [];
     public ICollection<AplicacionVacuna> AplicacionesVacunas { get; set; } = [];

@@ -8,8 +8,8 @@ public class ConsultaVersion
     public string? ValorAnterior { get; set; } = string.Empty;
     public string? ValorNuevo { get; set; } = string.Empty;
     public int IdConsulta { get; set; }
-    public Consulta Consulta { get; set; }
+    public Consulta Consulta { get; set; } = null!;
     public int IdProfesional { get; set; }
-    public Profesional Profesional { get; set; }
+    public Profesional Profesional { get; set; } = null!;
 
 }

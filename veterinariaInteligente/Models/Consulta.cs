@@ -14,9 +14,9 @@ public class Consulta
     public EstadoConsulta Estado { get; set; }
     
     public int IdMascota { get; set; }
-    public Mascota Mascota { get; set; }
+    public Mascota Mascota { get; set; } = null!;
     public int IdProfesional { get; set; }
-    public Profesional Profesional { get; set; }
+    public Profesional Profesional { get; set; } = null!;
     
     public DateTime FechaCreacion  { get; set; }
     public DateTime FechaModificacion { get; set; }
