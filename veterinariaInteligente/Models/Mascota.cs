@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
-
 namespace veterinariaInteligente.Models;
 
 public class Mascota
@@ -10,7 +8,7 @@ public class Mascota
     public string Sexo  { get; set; } = string.Empty;
     public DateOnly? FechaNacimiento  { get; set; }
     public string Color  { get; set; } = string.Empty;
-    public string Alergia  { get; set; } = string.Empty;
+    public string? Alergia  { get; set; } = string.Empty;
     public DateOnly? FechaArchivado  { get; set; }
     
     public int IdDuenio { get; set; }

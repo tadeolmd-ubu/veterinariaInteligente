@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<AplicacionVacuna> AplicacionVacunas => Set<AplicacionVacuna>();
     public DbSet<Seguimiento> Seguimientos => Set<Seguimiento>();
     public DbSet<Cita> Citas => Set<Cita>();
+    public DbSet<ConfiguracionCliente> ConfiguracionesCliente => Set<ConfiguracionCliente>();
+    public DbSet<MascotaEstado> MascotaEstados => Set<MascotaEstado>();
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -137,7 +139,7 @@ public class AppDbContext : DbContext
         });
         modelBuilder.Entity<AplicacionVacuna>(e =>
         {
-            e.ToTable("VacunaAplicacion");
+            e.ToTable("AplicacionVacuna");
             e.HasKey(x => x.Id);
 
             e.Property(x => x.Id).HasColumnName("id");
@@ -220,6 +222,21 @@ public class AppDbContext : DbContext
             e.HasOne(x => x.Profesional)
                 .WithMany(p => p.Citas)
                 .HasForeignKey(x => x.IdProfesional);
+        });
+        modelBuilder.Entity<ConfiguracionCliente>(e =>
+        {
+            e.ToTable("ConfiguracionCliente");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Nombre).HasColumnName("nombre").HasMaxLength(255).IsRequired();
+            e.Property(x => x.Telefono).HasColumnName("telefono").HasMaxLength(15).IsRequired();
+            e.Property(x => x.Direccion).HasColumnName("direccion").HasMaxLength(255).IsRequired();
+            
+            e.Property(x => x.IdProfesionalDefault).HasColumnName("idProfesionalDefault");
+            e.HasOne(x => x.ProfesionalDefault)
+                .WithMany()
+                .HasForeignKey(x => x.IdProfesionalDefault);
         });
     }
 }
