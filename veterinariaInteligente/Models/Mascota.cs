@@ -20,5 +20,6 @@ public class Mascota
     public MascotaEstado Estado { get; set; }
     
     public ICollection<Consulta> Consultas { get; set; } = [];
+    public ICollection<AplicacionVacuna> AplicacionesVacunas { get; set; } = [];
     
 }

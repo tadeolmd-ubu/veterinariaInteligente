@@ -8,5 +8,6 @@ public class Profesional
     public int Activo { get; set; }
     
     public ICollection<Consulta> Consultas { get; set; } = [];
+    public ICollection<AplicacionVacuna> AplicacionesVacunas { get; set; } = [];
     
 }
