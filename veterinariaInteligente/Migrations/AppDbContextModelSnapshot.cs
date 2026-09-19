@@ -381,6 +381,18 @@ namespace veterinariaInteligente.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MascotaEstado", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Nombre = "Activa"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Nombre = "Inactiva"
+                        });
                 });
 
             modelBuilder.Entity("veterinariaInteligente.Models.Profesional", b =>

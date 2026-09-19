@@ -238,5 +238,20 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.IdProfesionalDefault);
         });
+        
+        
+        modelBuilder.Entity<MascotaEstado>(e =>
+        {
+            e.ToTable("MascotaEstado");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.Nombre).HasColumnName("nombre").HasMaxLength(100).IsRequired();
+
+            e.HasData(
+                new MascotaEstado { Id = 1, Nombre = "Activa" },
+                new MascotaEstado { Id = 2, Nombre = "Inactiva" }
+            );
+        });
     }
 }
