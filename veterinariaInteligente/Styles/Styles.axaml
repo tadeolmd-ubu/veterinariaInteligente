@@ -1,0 +1,277 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <Color x:Key="BrandCyanColor">#2BC5F0</Color>
+        <Color x:Key="BrandTurquoiseColor">#1FBFB3</Color>
+        <Color x:Key="NavyColor">#0A2E4F</Color>
+        <Color x:Key="NavySoftColor">#123B63</Color>
+        <Color x:Key="NavyDarkColor">#071F36</Color>
+
+        <SolidColorBrush x:Key="BrandCyanBrush" Color="{StaticResource BrandCyanColor}"/>
+        <SolidColorBrush x:Key="BrandTurquoiseBrush" Color="{StaticResource BrandTurquoiseColor}"/>
+        <SolidColorBrush x:Key="NavyBrush" Color="{StaticResource NavyColor}"/>
+        <SolidColorBrush x:Key="NavySoftBrush" Color="{StaticResource NavySoftColor}"/>
+        <SolidColorBrush x:Key="NavyDarkBrush" Color="{StaticResource NavyDarkColor}"/>
+
+        <Color x:Key="AccentBarColor">#B8EEFB</Color>
+        <SolidColorBrush x:Key="AccentBarBrush" Color="{StaticResource AccentBarColor}"/>
+
+        <LinearGradientBrush x:Key="SidebarGradientBrush"
+                             StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="{StaticResource BrandCyanColor}"/>
+            <GradientStop Offset="1" Color="{StaticResource BrandTurquoiseColor}"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="NavyGradientBrush"
+                             StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="{StaticResource NavyColor}"/>
+            <GradientStop Offset="1" Color="{StaticResource NavyDarkColor}"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="PrimaryButtonBrush"
+                             StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="{StaticResource BrandCyanColor}"/>
+            <GradientStop Offset="1" Color="{StaticResource BrandTurquoiseColor}"/>
+        </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#F4F7FA"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="SurfaceAltBrush" Color="#EDF3F8"/>
+        <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#FBFCFF"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#E3EAF1"/>
+        <SolidColorBrush x:Key="BorderStrongBrush" Color="#C9D6E1"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#142B3C"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5C6F80"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#93A3B1"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#E4573D"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#2EBD85"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#F0A030"/>
+        <SolidColorBrush x:Key="InfoBrush" Color="#2F8FD1"/>
+
+        <Color x:Key="SidebarTextColor">#F4FBFF</Color>
+        <SolidColorBrush x:Key="SidebarTextBrush" Color="{StaticResource SidebarTextColor}"/>
+        <SolidColorBrush x:Key="SidebarInactiveBrush" Color="#D8F3FB"/>
+    </Styles.Resources>
+
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-Regular.ttf#Nunito"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-Regular.ttf#Nunito"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="9"/>
+        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="SelectionBrush" Value="{StaticResource BrandCyanBrush}"/>
+        <Setter Property="SelectionForegroundBrush" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="PlaceholderForeground" Value="{StaticResource TextMutedBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ Border#PART_Border">
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+        <Setter Property="BorderThickness" Value="1.5"/>
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-Regular.ttf#Nunito"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="9"/>
+        <Setter Property="Padding" Value="10,8"/>
+    </Style>
+
+    <Style Selector="DatePicker">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-Regular.ttf#Nunito"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{StaticResource PrimaryButtonBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
+    </Style>
+    <Style Selector="Button.primary /template/ Border#PART_Border">
+        <Setter Property="BoxShadow" Value="0 4 14 0 #2B20A7DF"/>
+    </Style>
+    <Style Selector="Button.primary:pressed">
+        <Setter Property="Background" Value="{StaticResource NavyBrush}"/>
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ Border#PART_Border">
+        <Setter Property="BoxShadow" Value="0 0 0 0 #00000000"/>
+    </Style>
+
+    <Style Selector="Button.secondary">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource NavyBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderStrongBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <Style Selector="Button.secondary:pointerover">
+        <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
+    </Style>
+    <Style Selector="Button.danger:pointerover">
+        <Setter Property="Opacity" Value="0.9"/>
+    </Style>
+
+    <Style Selector="Button.ghost">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource NavyBrush}"/>
+    </Style>
+    <Style Selector="Button.ghost:pointerover">
+        <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+    </Style>
+
+    <Style Selector="Button.small">
+        <Setter Property="Padding" Value="12,7"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+
+    <Style Selector="Button.icon">
+        <Setter Property="Padding" Value="9"/>
+        <Setter Property="FontSize" Value="15"/>
+    </Style>
+
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="BoxShadow" Value="0 6 18 0 #0F20323F"/>
+    </Style>
+
+    <Style Selector="Border.cardFlat">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <Style Selector="Border.chip">
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Padding" Value="10,4"/>
+    </Style>
+
+    <Style Selector="TextBlock.sectionTitle">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-ExtraBold.ttf#Nunito ExtraBold"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="ExtraBold"/>
+        <Setter Property="Foreground" Value="{StaticResource NavyBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.subsection">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource NavyBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.subsectionSoft">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.caption">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.fieldLabel">
+        <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.emptyState">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+    </Style>
+
+    <Style Selector="ListBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style Selector="ListBox.ownerList ListBoxItem">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="Margin" Value="2,0,6,8"/>
+    </Style>
+    <Style Selector="ListBox.ownerList ListBoxItem:pointerover">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+    <Style Selector="ListBox.ownerList ListBoxItem:selected">
+        <Setter Property="Background" Value="#EAF6FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+    <Style Selector="ListBox.ownerList ListBoxItem:selected:pointerover">
+        <Setter Property="Background" Value="#EAF6FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+
+    <Style Selector="ListBox.mascotaList ListBoxItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+    </Style>
+    <Style Selector="ListBox.mascotaList ListBoxItem /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="ListBox.mascotaList ListBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="ListBox.mascotaList ListBoxItem:pointerover Border.cardFlat">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+    <Style Selector="ListBox.mascotaList ListBoxItem:selected Border.cardFlat">
+        <Setter Property="Background" Value="#EAF6FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+    <Style Selector="ListBox.mascotaList ListBoxItem:selected:pointerover Border.cardFlat">
+        <Setter Property="Background" Value="#EAF6FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+</Styles>
