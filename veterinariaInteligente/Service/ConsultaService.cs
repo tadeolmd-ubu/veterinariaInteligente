@@ -44,7 +44,15 @@ public class ConsultaService
             .AsNoTracking()
             .Include(c => c.Mascota)
             .Include(c => c.Profesional)
+            .Include(c => c.Versiones)
             .FirstOrDefaultAsync(c => c.Id == id &&  c.Estado != EstadoConsulta.Archivada);
+    }
+
+    public async Task<Consulta?> ObtenerNoArchivadasAsync(int id)
+    {
+        return await _db.Consultas
+            .Where(c => c.Id == id && c.Estado != EstadoConsulta.Archivada)
+            .FirstOrDefaultAsync(c => c.Id == id && c.Estado != EstadoConsulta.Archivada);
     }
 
     public async Task<Resultado<Consulta>> AgregarAsync(string motivo, decimal? peso, string observacion, string diagnostico,
@@ -88,6 +96,88 @@ public class ConsultaService
         await _db.SaveChangesAsync();
 
         return new Resultado<Consulta>(true, "Consulta registrada.", nuevaConsulta);
+    }
+
+    public async Task<Resultado> ActualizarAsync(int id, string motivo, string observacion, string diagnostico, string tratamiento, decimal? peso, int idProfesional)
+    {
+        var consulta = await ObtenerNoArchivadasAsync(id);
+        if (consulta is null)
+            return new Resultado(false, "No se encontro la consulta a Actualizar.");
+        
+        var profesional = await _db.Profesionales
+            .FirstOrDefaultAsync(p => p.Id == idProfesional && p.Activo == 1);
+        if (profesional is null)
+            return new Resultado(false, "El profesional no existe o está inactivo.");
+        
+        var error = ValidarCampos(motivo, observacion, diagnostico, tratamiento, peso);
+        if (error is not null)
+            return new Resultado(false, error);
+        
+        motivo = NormalizarTexto(motivo);
+        diagnostico = NormalizarTexto(diagnostico);
+        observacion = NormalizarTexto(observacion);
+        tratamiento = NormalizarTexto(tratamiento);
+        
+        var motivoAnt = consulta.Motivo; 
+        var pesoAnt = consulta.Peso;
+        var obsAnt = consulta.Observacion; 
+        var diagAnt = consulta.Diagnostico;
+        var tratAnt = consulta.Tratamiento;
+
+        
+        var cambios = new[]
+        {
+            (Campo: nameof(Consulta.Motivo), Anterior: motivoAnt, Nuevo: motivo),
+            (Campo: nameof(Consulta.Observacion), Anterior: obsAnt, Nuevo: observacion),
+            (Campo: nameof(Consulta.Diagnostico), Anterior: diagAnt, Nuevo: diagnostico),
+            (Campo: nameof(Consulta.Tratamiento), Anterior: tratAnt, Nuevo: tratamiento),
+            (
+                Campo: nameof(Consulta.Peso),
+                Anterior: pesoAnt?.ToString(),
+                Nuevo: peso?.ToString()
+            )
+        };
+
+        foreach (var cambio in cambios)
+        {
+            RegistrarVersionSiCambio(
+                consulta,
+                cambio.Campo,
+                cambio.Anterior,
+                cambio.Nuevo,
+                idProfesional);
+        }
+        consulta.Motivo = motivo;
+        consulta.Observacion = observacion;
+        consulta.Diagnostico = diagnostico;
+        consulta.Tratamiento = tratamiento;
+        consulta.Peso = peso;
+        consulta.FechaModificacion = DateTime.Now;
+        
+        await _db.SaveChangesAsync();
+
+        
+        return new Resultado(true, "Consulta actualizada.");
+    }
+    private void RegistrarVersionSiCambio(
+        Consulta consulta,
+        string campo,
+        string? valorAnterior,
+        string? valorNuevo,
+        int idProfesional)
+    {
+        if (valorAnterior == valorNuevo)
+            return;
+
+        _db.ConsultaVersiones.Add(new ConsultaVersion
+        {
+            Fecha = DateTime.Now,
+            Campo = campo,
+            ValorAnterior = valorAnterior,
+            ValorNuevo = valorNuevo,
+            IdConsulta = consulta.Id,
+            IdProfesional = idProfesional
+        });
     }
     private static string? ValidarCampos (string motivo, string observacion, string diagnostico, string tratamiento, decimal? peso)
     {
