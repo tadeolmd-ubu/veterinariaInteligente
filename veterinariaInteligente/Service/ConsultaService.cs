@@ -123,7 +123,6 @@ public class ConsultaService
         var obsAnt = consulta.Observacion; 
         var diagAnt = consulta.Diagnostico;
         var tratAnt = consulta.Tratamiento;
-
         
         var cambios = new[]
         {
@@ -159,6 +158,37 @@ public class ConsultaService
         
         return new Resultado(true, "Consulta actualizada.");
     }
+
+    public async Task<Resultado<List<Consulta>>> ObtenerExpedienteAsync(int idMascota)
+    {var mascota = await _db.Mascotas
+            .FirstOrDefaultAsync(m =>
+                m.Id == idMascota &&
+                m.FechaArchivado == null &&
+                m.IdEstado == 1);
+
+        if (mascota is null)
+        {
+            return new Resultado<List<Consulta>>(
+                false,
+                "La mascota no existe, está archivada o no está activa.",
+                null);
+        }
+
+        var consultas = await _db.Consultas
+            .AsNoTracking()
+            .Include(c => c.Versiones)
+            .Where(c =>
+                c.IdMascota == idMascota &&
+                c.Estado != EstadoConsulta.Archivada)
+            .OrderByDescending(c => c.FechaCreacion)
+            .ToListAsync();
+
+        return new Resultado<List<Consulta>>(
+            true,
+            "Expediente obtenido.",
+            consultas);
+    }
+
     private void RegistrarVersionSiCambio(
         Consulta consulta,
         string campo,
