@@ -51,19 +51,18 @@ public class ConsultaService
     public async Task<Consulta?> ObtenerNoArchivadasAsync(int id)
     {
         return await _db.Consultas
-            .Where(c => c.Id == id && c.Estado != EstadoConsulta.Archivada)
             .FirstOrDefaultAsync(c => c.Id == id && c.Estado != EstadoConsulta.Archivada);
     }
 
     public async Task<Resultado<Consulta>> AgregarAsync(string motivo, decimal? peso, string observacion, string diagnostico,
-        string tratamiento, int idMascota, int idProfesional, EstadoConsulta estado = EstadoConsulta.Pendiente)
+        string tratamiento, int idMascota, int idProfesional)
     {
         var error = ValidarCampos(motivo, observacion, diagnostico, tratamiento, peso);
         if (error is not null)
             return new Resultado<Consulta>(false, error, null);
 
         var mascota = await _db.Mascotas
-            .FirstOrDefaultAsync(m => m.Id == idMascota && m.FechaArchivado == null);
+            .FirstOrDefaultAsync(m => m.Id == idMascota && m.FechaArchivado == null && m.IdEstado == 1);
         if (mascota is null)
             return new Resultado<Consulta>(false, "La mascota no existe o está archivada.", null);
 
@@ -87,7 +86,7 @@ public class ConsultaService
             IdMascota = idMascota,
             Peso =  peso,
             IdProfesional = idProfesional,
-            Estado = estado,
+            Estado = EstadoConsulta.Pendiente,
             FechaCreacion = DateTime.Now,
             FechaModificacion = DateTime.Now,
         };
@@ -159,8 +158,40 @@ public class ConsultaService
         return new Resultado(true, "Consulta actualizada.");
     }
 
+    public async Task<Resultado> ArchivarAsync(int id)
+    {
+        var consulta = await ObtenerNoArchivadasAsync(id);
+        if (consulta is null)
+        {
+            return new Resultado(false, "La consulta no se encontro.");
+        }
+
+        consulta.Estado = EstadoConsulta.Archivada;
+        consulta.FechaModificacion = DateTime.Now;
+        
+        await _db.SaveChangesAsync();
+        
+        return new Resultado(true, "Consulta archivada.");
+    }
+
+    public async Task<Resultado> RestaurarAsync(int id)
+    {
+        var consulta = await _db.Consultas.FirstOrDefaultAsync(c => c.Id == id && c.Estado == EstadoConsulta.Archivada);
+        if (consulta is null)
+        {
+            return new Resultado(false, "La consulta no se encontro.");
+        }
+        consulta.Estado = EstadoConsulta.Pendiente;
+        consulta.FechaModificacion = DateTime.Now;
+        
+        await _db.SaveChangesAsync();
+        
+        return new Resultado(true, "Consulta restaurada.");
+    }
+
     public async Task<Resultado<List<Consulta>>> ObtenerExpedienteAsync(int idMascota)
-    {var mascota = await _db.Mascotas
+    {
+        var mascota = await _db.Mascotas
             .FirstOrDefaultAsync(m =>
                 m.Id == idMascota &&
                 m.FechaArchivado == null &&
@@ -176,6 +207,7 @@ public class ConsultaService
 
         var consultas = await _db.Consultas
             .AsNoTracking()
+            .Include(c => c.Profesional)
             .Include(c => c.Versiones)
             .Where(c =>
                 c.IdMascota == idMascota &&
@@ -217,14 +249,14 @@ public class ConsultaService
             return $"El motivo no puede superar los {MaxMotivo} caracteres.";
 
         if (string.IsNullOrWhiteSpace(observacion))
-            return "La observacion es obligatorio.";
+            return "La observación es obligatoria.";
         if (observacion.Trim().Length > MaxObservacion)
-            return $"La observacion no puede superar los {MaxObservacion} caracteres.";
+            return $"La observación no puede superar los {MaxObservacion} caracteres.";
         
         if (string.IsNullOrWhiteSpace(diagnostico))
-            return "El diagnostico de la mascota es obligatorio.";
+            return "El diagnóstico es obligatorio.";
         if (diagnostico.Trim().Length > MaxDiagnostico)
-            return $"El diagnositoc no puede superar los {MaxDiagnostico} caracteres.";
+            return $"El diagnóstico no puede superar los {MaxDiagnostico} caracteres.";
         
         if (string.IsNullOrWhiteSpace(tratamiento))
             return "El tratamiento de la mascota es obligatorio.";
