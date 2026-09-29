@@ -1,6 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Microsoft.EntityFrameworkCore;
+using veterinariaInteligente.Data;
+using veterinariaInteligente.Service;
+using veterinariaInteligente.ViewModels;
 
 namespace veterinariaInteligente;
 
@@ -15,9 +19,52 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            var rutaBaseDatos = ResolverRutaBaseDatos();
+
+            var opciones = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlite($"Data Source={rutaBaseDatos}")
+                .Options;
+
+            var dbContext = new AppDbContext(opciones);
+            var duenioService = new DuenioService(dbContext);
+            var mascotaService = new MascotaService(dbContext);
+            var propietariosViewModel = new PropietariosViewModel(duenioService, mascotaService);
+            var mainViewModel = new MainViewModel(propietariosViewModel);
+
+            var mainWindow = new MainWindow
+            {
+                DataContext = mainViewModel
+            };
+
+            mainWindow.Opened += async (_, _) => await mainViewModel.InicializarAsync();
+            desktop.Exit += (_, _) => dbContext.Dispose();
+            desktop.MainWindow = mainWindow;
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static string ResolverRutaBaseDatos()
+    {
+        var directorio = new DirectoryInfo(Directory.GetCurrentDirectory());
+
+        while (directorio is not null)
+        {
+            var rutaDirecta = Path.Combine(directorio.FullName, "veterinariaInteligente.db");
+            if (File.Exists(rutaDirecta))
+                return rutaDirecta;
+
+            var rutaDentroDelProyecto = Path.Combine(
+                directorio.FullName,
+                "veterinariaInteligente",
+                "veterinariaInteligente.db");
+
+            if (File.Exists(rutaDentroDelProyecto))
+                return rutaDentroDelProyecto;
+
+            directorio = directorio.Parent;
+        }
+
+        return Path.Combine(Directory.GetCurrentDirectory(), "veterinariaInteligente.db");
     }
 }
