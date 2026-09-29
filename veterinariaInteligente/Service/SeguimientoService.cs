@@ -44,6 +44,9 @@ public class SeguimientoService
         return await _db.Seguimientos
             .AsNoTracking()
             .Include(s => s.Mascota)
+            .Include(s => s.ConsultaOrigen)
+            .Include(s => s.AplicacionVacunaOrigen)
+            .Include(s => s.ConsultaRealizacion)
             .Where(s =>
                 s.Estado == EstadoSeguimiento.Pendiente &&
                 s.FechaPrevista < fecha)
@@ -126,10 +129,7 @@ public class SeguimientoService
         DateOnly fechaPrevista,
         string? notas)
     {
-        var seguimiento = await _db.Seguimientos
-            .FirstOrDefaultAsync(s =>
-                s.Id == id &&
-                s.Estado == EstadoSeguimiento.Pendiente);
+        var seguimiento = await BuscarPendienteAsync(id);
 
         if (seguimiento is null)
         {
@@ -157,10 +157,7 @@ public class SeguimientoService
         DateOnly fechaRealizada,
         int? idConsultaRealizacion)
     {
-        var seguimiento = await _db.Seguimientos
-            .FirstOrDefaultAsync(s =>
-                s.Id == id &&
-                s.Estado == EstadoSeguimiento.Pendiente);
+        var seguimiento = await BuscarPendienteAsync(id);
 
         if (seguimiento is null)
         {
@@ -203,10 +200,7 @@ public class SeguimientoService
 
     public async Task<Resultado> CancelarAsync(int id)
     {
-        var seguimiento = await _db.Seguimientos
-            .FirstOrDefaultAsync(s =>
-                s.Id == id &&
-                s.Estado == EstadoSeguimiento.Pendiente);
+        var seguimiento = await BuscarPendienteAsync(id);
 
         if (seguimiento is null)
         {
@@ -220,6 +214,14 @@ public class SeguimientoService
         await _db.SaveChangesAsync();
 
         return new Resultado(true, "Seguimiento cancelado.");
+    }
+
+    private async Task<Seguimiento?> BuscarPendienteAsync(int id)
+    {
+        return await _db.Seguimientos
+            .FirstOrDefaultAsync(s =>
+                s.Id == id &&
+                s.Estado == EstadoSeguimiento.Pendiente);
     }
 
     private async Task<Resultado> ValidarRelacionesAsync(
