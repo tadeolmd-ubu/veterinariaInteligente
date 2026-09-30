@@ -3,13 +3,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="using:veterinariaInteligente.Views"
+        xmlns:vm="using:veterinariaInteligente.ViewModels"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+        x:DataType="vm:MainViewModel"
         x:Class="veterinariaInteligente.MainWindow"
         Title="BLOO.paw"
         Icon="avares://veterinariaInteligente/Assets/Logo.ico"
         Width="1280" Height="800"
         MinWidth="1100" MinHeight="700"
         Background="{StaticResource ContentBackgroundBrush}">
+
+    <Window.DataTemplates>
+        <DataTemplate DataType="vm:PropietariosViewModel">
+            <views:PropietariosView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ExpedienteViewModel">
+            <views:ExpedienteView/>
+        </DataTemplate>
+    </Window.DataTemplates>
 
     <Grid ColumnDefinitions="262,*">
 
@@ -33,7 +44,7 @@
                 </Grid>
             </Border>
 
-            <views:PropietariosView Grid.Row="1"/>
+            <ContentControl Grid.Row="1" Content="{Binding VistaActual}"/>
 
         </Grid>
     </Grid>
