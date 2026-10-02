@@ -36,6 +36,17 @@ public partial class App : Application
                 mascotaService,
                 profesionalService);
             var mainViewModel = new MainViewModel(propietariosViewModel, citasViewModel);
+            var consultaService = new ConsultaService(dbContext);
+            var profesionalService = new ProfesionalService(dbContext);
+            var propietariosViewModel = new PropietariosViewModel(duenioService, mascotaService);
+            var consultasViewModel = new ConsultasViewModel(
+                consultaService,
+                mascotaService,
+                profesionalService);
+            var mainViewModel = new MainViewModel(
+                propietariosViewModel,
+                consultasViewModel,
+                consultaService);
 
             var mainWindow = new MainWindow
             {
