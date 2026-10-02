@@ -28,8 +28,17 @@ public partial class App : Application
             var dbContext = new AppDbContext(opciones);
             var duenioService = new DuenioService(dbContext);
             var mascotaService = new MascotaService(dbContext);
+            var consultaService = new ConsultaService(dbContext);
+            var profesionalService = new ProfesionalService(dbContext);
             var propietariosViewModel = new PropietariosViewModel(duenioService, mascotaService);
-            var mainViewModel = new MainViewModel(propietariosViewModel);
+            var consultasViewModel = new ConsultasViewModel(
+                consultaService,
+                mascotaService,
+                profesionalService);
+            var mainViewModel = new MainViewModel(
+                propietariosViewModel,
+                consultasViewModel,
+                consultaService);
 
             var mainWindow = new MainWindow
             {
