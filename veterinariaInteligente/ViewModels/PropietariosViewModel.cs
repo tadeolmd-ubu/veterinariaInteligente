@@ -13,6 +13,12 @@ public partial class PropietariosViewModel : ObservableObject
     private readonly DuenioService? _duenioService;
     private readonly MascotaService? _mascotaService;
     private readonly List<Duenio> _propietariosCargados = [];
+    private readonly List<Duenio> _propietariosArchivados = [];
+
+    [ObservableProperty]
+    private bool mostrandoArchivados;
+
+    partial void OnMostrandoArchivadosChanged(bool value) => FiltrarPropietarios();
     private readonly List<Mascota> _mascotasCargadas = [];
 
     public PropietariosViewModel()
@@ -75,7 +81,7 @@ public partial class PropietariosViewModel : ObservableObject
     [ObservableProperty]
     private string mensajeOperacion = string.Empty;
 
-    public Task CargarAsync() => RecargarAsync();
+    public Task CargarAsync() => EjecutarSeguroAsync(() => RecargarAsync());
 
     partial void OnSelectedPropietarioChanged(Duenio? value)
     {
@@ -99,7 +105,9 @@ public partial class PropietariosViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AgregarPropietarioAsync()
+    private Task AgregarPropietarioAsync() => EjecutarSeguroAsync(AgregarPropietarioInternoAsync);
+
+    private async Task AgregarPropietarioInternoAsync()
     {
         if (_duenioService is null)
             return;
@@ -120,7 +128,9 @@ public partial class PropietariosViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ActualizarPropietarioAsync()
+    private Task ActualizarPropietarioAsync() => EjecutarSeguroAsync(ActualizarPropietarioInternoAsync);
+
+    private async Task ActualizarPropietarioInternoAsync()
     {
         if (_duenioService is null || SelectedPropietario is null)
             return;
@@ -140,7 +150,9 @@ public partial class PropietariosViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ArchivarPropietarioAsync()
+    private Task ArchivarPropietarioAsync() => EjecutarSeguroAsync(ArchivarPropietarioInternoAsync);
+
+    private async Task ArchivarPropietarioInternoAsync()
     {
         if (_duenioService is null || SelectedPropietario is null)
             return;
@@ -153,7 +165,9 @@ public partial class PropietariosViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task RestaurarPropietarioAsync()
+    private Task RestaurarPropietarioAsync() => EjecutarSeguroAsync(RestaurarPropietarioInternoAsync);
+
+    private async Task RestaurarPropietarioInternoAsync()
     {
         if (_duenioService is null || SelectedPropietario is null)
             return;
@@ -166,7 +180,9 @@ public partial class PropietariosViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AgregarMascotaAsync()
+    private Task AgregarMascotaAsync() => EjecutarSeguroAsync(AgregarMascotaInternoAsync);
+
+    private async Task AgregarMascotaInternoAsync()
     {
         if (_mascotaService is null || SelectedPropietario is null)
             return;
@@ -196,7 +212,9 @@ public partial class PropietariosViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ArchivarMascotaAsync()
+    private Task ArchivarMascotaAsync() => EjecutarSeguroAsync(ArchivarMascotaInternoAsync);
+
+    private async Task ArchivarMascotaInternoAsync()
     {
         if (_mascotaService is null || SelectedMascota is null)
             return;
@@ -225,6 +243,9 @@ public partial class PropietariosViewModel : ObservableObject
 
         var propietarios = await _duenioService.ObtenerTodosAsync();
         var mascotas = await _mascotaService.ObtenerTodosAsync();
+        var archivados = await _duenioService.ObtenerArchivadosAsync();
+        _propietariosArchivados.Clear();
+        _propietariosArchivados.AddRange(archivados);
 
         _mascotasCargadas.Clear();
         _mascotasCargadas.AddRange(mascotas);
@@ -245,11 +266,12 @@ public partial class PropietariosViewModel : ObservableObject
     private void FiltrarPropietarios(int? propietarioIdSeleccionado = null)
     {
         var idSeleccionado = propietarioIdSeleccionado ?? SelectedPropietario?.Id;
-        var termino = BusquedaPropietarios.Trim();
+        var termino = BusquedaPropietarios?.Trim() ?? string.Empty;
+        var origen = MostrandoArchivados ? _propietariosArchivados : _propietariosCargados;
 
         var propietariosFiltrados = string.IsNullOrEmpty(termino)
-            ? _propietariosCargados
-            : _propietariosCargados
+            ? origen
+            : origen
                 .Where(p =>
                     p.Nombre.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
                     p.Telefono.Contains(termino, StringComparison.OrdinalIgnoreCase))
@@ -265,6 +287,16 @@ public partial class PropietariosViewModel : ObservableObject
         SelectedPropietario = PropietariosItems
             .FirstOrDefault(p => p.Id == idSeleccionado)
             ?? PropietariosItems.FirstOrDefault();
+    }
+
+    private bool _operacionEnCurso;
+    private async Task EjecutarSeguroAsync(Func<Task> operacion)
+    {
+        if (_operacionEnCurso) return;
+        _operacionEnCurso = true;
+        try { await operacion(); }
+        catch (Exception ex) { MensajeOperacion = $"No se pudo completar la operación: {ex.Message}"; }
+        finally { _operacionEnCurso = false; }
     }
 
     private void LimpiarFormularioPropietario()
