@@ -42,6 +42,9 @@ public partial class CitasViewModel : ObservableObject
     ];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CambiarEstadoCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CancelarCitaCommand))]
     [NotifyPropertyChangedFor(nameof(PuedeModificar))]
     [NotifyPropertyChangedFor(nameof(PuedeCancelar))]
     private Cita? selectedCita;
@@ -68,6 +71,9 @@ public partial class CitasViewModel : ObservableObject
     private string busquedaCitas = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CambiarEstadoCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CancelarCitaCommand))]
     [NotifyPropertyChangedFor(nameof(PuedeModificar))]
     [NotifyPropertyChangedFor(nameof(PuedeCancelar))]
     private bool mostrandoCanceladas;
@@ -85,10 +91,15 @@ public partial class CitasViewModel : ObservableObject
     private string mensajeOperacion = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CambiarEstadoCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CancelarCitaCommand))]
+    [NotifyPropertyChangedFor(nameof(PuedeModificar))]
+    [NotifyPropertyChangedFor(nameof(PuedeCancelar))]
     private bool isBusy;
 
-    public bool PuedeModificar => SelectedCita is not null && !MostrandoCanceladas;
-    public bool PuedeCancelar => SelectedCita is not null && !MostrandoCanceladas;
+    public bool PuedeModificar => !IsBusy && SelectedCita is { Estado: not EstadoCita.Cancelada } && !MostrandoCanceladas;
+    public bool PuedeCancelar => !IsBusy && SelectedCita is { Estado: not EstadoCita.Cancelada } && !MostrandoCanceladas;
 
     [RelayCommand]
     public Task CargarAsync() => EjecutarSeguroAsync(() => RecargarAsync());
@@ -105,6 +116,9 @@ public partial class CitasViewModel : ObservableObject
         SelectedMascota = MascotasItems.FirstOrDefault(m => m.Id == value.IdMascota);
         SelectedProfesional = ProfesionalesItems.FirstOrDefault(p => p.Id == value.IdProfesional);
     }
+
+    partial void OnMostrandoCanceladasChanged(bool value) => FiltrarCitas();
+    partial void OnMostrandoAgendaChanged(bool value) => FiltrarCitas();
 
     partial void OnBusquedaCitasChanged(string value)
     {
@@ -141,7 +155,7 @@ public partial class CitasViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeModificar))]
     private async Task ActualizarCitaAsync()
     {
         if (_citaService is null || SelectedCita is null)
@@ -169,7 +183,7 @@ public partial class CitasViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeModificar))]
     private async Task CambiarEstadoCitaAsync()
     {
         if (_citaService is null || SelectedCita is null)
@@ -187,7 +201,7 @@ public partial class CitasViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeModificar))]
     private async Task CancelarCitaAsync()
     {
         if (_citaService is null || SelectedCita is null)
@@ -239,7 +253,7 @@ public partial class CitasViewModel : ObservableObject
         }
 
         var desde = AgendaDesde.Value.LocalDateTime.Date;
-        var hasta = AgendaHasta.Value.LocalDateTime.Date.AddDays(1).AddTicks(-1);
+        var hasta = FinDelDia(AgendaHasta.Value.Date);
 
         if (desde > hasta)
         {
@@ -298,13 +312,16 @@ public partial class CitasViewModel : ObservableObject
         FiltrarCitas(citaIdSeleccionada);
     }
 
+    private static DateTime FinDelDia(DateTime fecha) =>
+        fecha == DateTime.MaxValue.Date ? DateTime.MaxValue : fecha.AddDays(1).AddTicks(-1);
+
     private async Task RecargarAgendaAsync()
     {
         if (_citaService is null || AgendaDesde is null || AgendaHasta is null)
             return;
 
         var desde = AgendaDesde.Value.LocalDateTime.Date;
-        var hasta = AgendaHasta.Value.LocalDateTime.Date.AddDays(1).AddTicks(-1);
+        var hasta = FinDelDia(AgendaHasta.Value.Date);
         var citas = await _citaService.ObtenerAgendaAsync(desde, hasta);
 
         _citasAgenda.Clear();
@@ -314,7 +331,7 @@ public partial class CitasViewModel : ObservableObject
     private void FiltrarCitas(int? citaIdSeleccionada = null)
     {
         var idSeleccionado = citaIdSeleccionada ?? SelectedCita?.Id;
-        var termino = BusquedaCitas.Trim();
+        var termino = BusquedaCitas?.Trim() ?? string.Empty;
         var origen = MostrandoCanceladas
             ? _citasCanceladas
             : MostrandoAgenda
