@@ -14,12 +14,14 @@ public partial class MainViewModel : ObservableObject
         PropietariosViewModel propietariosViewModel,
         CitasViewModel citasViewModel,
         PendientesViewModel pendientesViewModel,
+        VacunasViewModel vacunasViewModel,
         ConsultasViewModel consultasViewModel,
         ConsultaService consultaService)
     {
         _propietariosViewModel = propietariosViewModel;
         _citasViewModel = citasViewModel;
         _pendientesViewModel = pendientesViewModel;
+        _vacunasViewModel = vacunasViewModel;
         _consultasViewModel = consultasViewModel;
         _consultaService = consultaService;
         _propietariosViewModel.ExpedienteSolicitado += MostrarExpediente;
@@ -30,6 +32,15 @@ public partial class MainViewModel : ObservableObject
     private readonly ConsultasViewModel _consultasViewModel;
     private readonly ConsultaService _consultaService;
     private readonly PendientesViewModel _pendientesViewModel;
+    private readonly VacunasViewModel _vacunasViewModel;
+
+    [RelayCommand]
+    private async Task IrAVacunasAsync()
+    {
+        VistaActual = _vacunasViewModel;
+        TituloVistaActual = "Vacunas";
+        await _vacunasViewModel.CargarAsync();
+    }
 
     [ObservableProperty]
     private object vistaActual;
