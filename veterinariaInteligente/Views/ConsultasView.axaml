@@ -1,4 +1,209 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:models="using:veterinariaInteligente.Models"
+             xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             d:DataContext="{x:Static dt:DesignTimeData.Consultas}"
+             x:DataType="dt:ConsultasDesignTime"
              x:Class="veterinariaInteligente.Views.ConsultasView">
+
+    <UserControl.Resources>
+        <conv:InicialesConverter x:Key="Iniciales"/>
+        <conv:EstadoConsultaConverter x:Key="EstConsulta"/>
+        <conv:TabEstadoConverter x:Key="TabFondo" EsFondo="True"/>
+        <conv:TabEstadoConverter x:Key="TabTexto" EsFondo="False"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Button.chipTab">
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderStrongBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
+        <Grid RowDefinitions="Auto,*" RowSpacing="20">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="Consultas" Classes="sectionTitle"/>
+                    <TextBlock Text="Historial clínico, diagnóstico y tratamiento" Classes="caption"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Classes="primary" Command="{Binding NuevaConsultaCommand}">Nueva consulta</Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="390,*" ColumnSpacing="22">
+
+                <Border Classes="card" Grid.Column="0" Padding="0">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+                        <TextBlock Text="Consultas" Classes="subsection" Margin="20,18,20,0"/>
+
+                        <StackPanel Grid.Row="1" Margin="20,12,20,0" Spacing="10">
+                            <TextBox PlaceholderText="Buscar por motivo, mascota o veterinario…"
+                                     Text="{Binding BusquedaConsultas}"/>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Button Classes="chipTab"
+                                        Background="{Binding MostrandoArchivadas, Converter={StaticResource TabFondo}, ConverterParameter=Activas}"
+                                        Foreground="{Binding MostrandoArchivadas, Converter={StaticResource TabTexto}, ConverterParameter=Activas}"
+                                        Command="{Binding VerConsultasActivasCommand}">Activas</Button>
+                                <Button Grid.Column="1" Classes="chipTab"
+                                        Background="{Binding MostrandoArchivadas, Converter={StaticResource TabFondo}, ConverterParameter=Archivadas}"
+                                        Foreground="{Binding MostrandoArchivadas, Converter={StaticResource TabTexto}, ConverterParameter=Archivadas}"
+                                        Command="{Binding VerConsultasArchivadasCommand}">Archivadas</Button>
+                            </Grid>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="2" Text="Selecciona una consulta"
+                                   Classes="caption" Margin="20,10,20,0"/>
+
+                        <ListBox Grid.Row="3" Classes="consultasList" Margin="8,6,8,12"
+                                 ItemsSource="{Binding ConsultasItems}"
+                                 SelectedItem="{Binding SelectedConsulta}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:Consulta">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                        <Border Width="42" Height="42" CornerRadius="21"
+                                                Background="{StaticResource PrimaryButtonBrush}">
+                                            <TextBlock Text="{Binding Mascota.Nombre, Converter={StaticResource Iniciales}}"
+                                                       FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                                       Foreground="{StaticResource SurfaceBrush}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding Motivo}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Classes="caption" TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} · {1:dd/MM/yyyy}">
+                                                        <Binding Path="Mascota.Nombre"/>
+                                                        <Binding Path="FechaCreacion"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
+                                                Background="{Binding Estado, Converter={StaticResource EstConsulta}, ConverterParameter=fondo}">
+                                            <TextBlock Text="{Binding Estado, Converter={StaticResource EstConsulta}, ConverterParameter=nombre}"
+                                                       FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       Foreground="{Binding Estado, Converter={StaticResource EstConsulta}, ConverterParameter=texto}"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="22" Margin="0,0,0,8">
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="16">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="Detalle de la consulta" Classes="subsection"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="secondary small" Command="{Binding RestaurarConsultaCommand}">Restaurar</Button>
+                                        <Button Classes="danger small" Command="{Binding ArchivarConsultaCommand}">Archivar</Button>
+                                        <Button Classes="primary small" Command="{Binding ActualizarConsultaCommand}">Guardar</Button>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Mascota" Classes="fieldLabel"/>
+                                        <ComboBox ItemsSource="{Binding MascotasItems}"
+                                                  SelectedItem="{Binding SelectedMascota}"
+                                                  DisplayMemberBinding="{Binding Nombre}"
+                                                  HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="5">
+                                        <TextBlock Text="Veterinario" Classes="fieldLabel"/>
+                                        <ComboBox ItemsSource="{Binding ProfesionalesItems}"
+                                                  SelectedItem="{Binding SelectedProfesional}"
+                                                  DisplayMemberBinding="{Binding Nombre}"
+                                                  HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Motivo" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Motivo de la consulta" Text="{Binding Motivo}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Spacing="5">
+                                        <TextBlock Text="Peso (kg)" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Peso" Text="{Binding Peso}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Spacing="5">
+                                        <TextBlock Text="Fecha de creación" Classes="fieldLabel"/>
+                                        <TextBlock Text="{Binding SelectedConsulta.FechaCreacion, StringFormat={}{0:dd/MM/yyyy}}"
+                                                   VerticalAlignment="Center" FontWeight="SemiBold"
+                                                   FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Diagnóstico" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Diagnóstico" Text="{Binding Diagnostico}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Tratamiento" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Tratamiento indicado" Text="{Binding Tratamiento}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Observación" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Notas y observaciones"
+                                                 Text="{Binding Observacion}"
+                                                 AcceptsReturn="True" TextWrapping="Wrap" Height="88"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="14">
+                                <TextBlock Text="Historial de la consulta" Classes="subsection"/>
+                                <ItemsControl ItemsSource="{Binding SelectedConsulta.Versiones}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ConsultaVersion">
+                                            <Border Margin="0,0,8,10" Padding="14,12"
+                                                    CornerRadius="10" Background="{StaticResource SurfaceAltBrush}"
+                                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                                    <Border Classes="chip" Background="#EAF2FD" VerticalAlignment="Top">
+                                                        <TextBlock Text="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy hh:mm}}"
+                                                                   FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                                   Foreground="{StaticResource InfoBrush}"/>
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" Spacing="3">
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <TextBlock Text="{Binding Campo}" FontSize="13" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding Profesional.Nombre}" Classes="caption" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                                            <TextBlock Classes="caption" Text="{Binding ValorAnterior, StringFormat={}{0}}"/>
+                                                            <TextBlock Classes="caption">→</TextBlock>
+                                                            <TextBlock Classes="caption" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                                       Text="{Binding ValorNuevo}" TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+            </Grid>
+        </Grid>
+    </Border>
 </UserControl>

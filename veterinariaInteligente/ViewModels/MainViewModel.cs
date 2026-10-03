@@ -82,6 +82,20 @@ public partial class MainViewModel : ObservableObject
         await _consultasViewModel.CargarAsync();
     }
 
+    [RelayCommand]
+    private void IrAInicio()
+    {
+        VistaActual = new InicioViewModel();
+        TituloVistaActual = "Inicio";
+    }
+
+    [RelayCommand]
+    private void IrAConfiguracion()
+    {
+        VistaActual = new ConfiguracionViewModel();
+        TituloVistaActual = "Configuración";
+    }
+
     private async void MostrarExpediente(Mascota mascota, Duenio duenio)
     {
         var expedienteViewModel = new ExpedienteViewModel(mascota, duenio, _consultaService);

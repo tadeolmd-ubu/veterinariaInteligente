@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
         x:DataType="vm:MainViewModel"
         x:Class="veterinariaInteligente.MainWindow"
-        Title="BLOO.paw"
+        Title="PawDesk"
         Icon="avares://veterinariaInteligente/Assets/Logo.ico"
         Width="1280" Height="800"
         MinWidth="1100" MinHeight="700"
@@ -19,6 +19,9 @@
         </DataTemplate>
         <DataTemplate DataType="vm:ExpedienteViewModel">
             <views:ExpedienteView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ConsultasViewModel">
+            <views:ConsultasView/>
         </DataTemplate>
     </Window.DataTemplates>
 
@@ -33,10 +36,10 @@
                     Padding="28,0">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel VerticalAlignment="Center" Spacing="2">
-                        <TextBlock Text="BLOO.paw"
+                        <TextBlock Text="PawDesk"
                                    FontSize="19" FontWeight="ExtraBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-ExtraBold.ttf#Nunito ExtraBold"
                                    Foreground="{StaticResource SurfaceBrush}"/>
-                        <TextBlock Text="Propietarios y mascotas"
+                        <TextBlock Text="{Binding TituloVistaActual}"
                                    FontSize="12" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
                                    Foreground="{StaticResource SidebarTextBrush}"
                                    Opacity="0.75"/>
