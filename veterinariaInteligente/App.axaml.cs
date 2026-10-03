@@ -47,6 +47,8 @@ public partial class App : Application
                 propietariosViewModel,
                 citasViewModel,
                 pendientesViewModel,
+                new VacunasViewModel(new VacunaService(dbContext),
+                    new AplicacionVacunaService(dbContext), mascotaService, profesionalService),
                 consultasViewModel,
                 consultaService);
 
