@@ -8,6 +8,14 @@ namespace veterinariaInteligente.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly PropietariosViewModel _propietariosViewModel;
+    private readonly CitasViewModel _citasViewModel;
+
+    public MainViewModel(
+        PropietariosViewModel propietariosViewModel,
+        CitasViewModel citasViewModel)
+    {
+        _propietariosViewModel = propietariosViewModel;
+        _citasViewModel = citasViewModel;
     private readonly ConsultasViewModel _consultasViewModel;
     private readonly ConsultaService _consultaService;
 
@@ -41,6 +49,17 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task IrACitasAsync()
+    {
+        VistaActual = _citasViewModel;
+        TituloVistaActual = "Citas";
+        await _citasViewModel.CargarAsync();
+    }
+
+    private void MostrarExpediente(Mascota mascota, Duenio duenio)
+    {
+        VistaActual = new ExpedienteViewModel(mascota, duenio);
+        TituloVistaActual = $"Expediente de {mascota.Nombre}";
     private async Task IrAConsultasAsync()
     {
         VistaActual = _consultasViewModel;
