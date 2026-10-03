@@ -1,41 +1,44 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             x:DataType="vm:MainViewModel"
              x:Class="veterinariaInteligente.Views.SidebarView">
 
     <UserControl.Resources>
         <SolidColorBrush x:Key="PillActiveBrush" Color="#0A2E4F"/>
         <SolidColorBrush x:Key="PillInactiveBrush" Color="#5FFFFFFF"/>
-        <SolidColorBrush x:Key="PillHoverBrush" Color="#80FFFFFF"/>
         <SolidColorBrush x:Key="PillTextBrush" Color="#F4FBFF"/>
         <SolidColorBrush x:Key="PillIconBrush" Color="#0A2E4F"/>
+        <conv:VistaActualConverter x:Key="VistaFondo"/>
+        <conv:VistaActualConverter x:Key="VistaTexto" Modo="texto"/>
+        <conv:VistaActualConverter x:Key="VistaBarra" Modo="barra"/>
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="Border.navPill">
+        <Style Selector="Button.navPill">
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Padding" Value="6,5"/>
             <Setter Property="Margin" Value="12,3"/>
-            <Setter Property="Background" Value="{StaticResource PillInactiveBrush}"/>
-        </Style>
-
-        <Style Selector="Border.navPill:pointerover">
-            <Setter Property="Background" Value="{StaticResource PillHoverBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
     </UserControl.Styles>
 
     <Border Background="{StaticResource SidebarGradientBrush}">
         <Grid RowDefinitions="Auto,*,Auto">
 
-<StackPanel Grid.Row="0" Orientation="Horizontal" Margin="22,26,16,22" Spacing="12">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="22,26,16,22" Spacing="12">
                 <Image Source="avares://veterinariaInteligente/Assets/Logo_DarkBlue.png"
                        Width="46" Height="46"
                        Stretch="Uniform"/>
                 <StackPanel VerticalAlignment="Center" Spacing="0">
-                    <TextBlock Text="BLOO"
-                               FontSize="21" FontWeight="ExtraBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-ExtraBold.ttf#Nunito ExtraBold"
+                    <TextBlock Text="PawDesk"
+                               FontSize="20" FontWeight="ExtraBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-ExtraBold.ttf#Nunito ExtraBold"
                                Foreground="{StaticResource NavyBrush}"/>
-                    <TextBlock Text="paw"
-                               FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                    <TextBlock Text="Gestión veterinaria"
+                               FontSize="13" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
                                Foreground="{StaticResource NavyBrush}"
                                Opacity="0.75"/>
                 </StackPanel>
@@ -44,8 +47,13 @@
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="0,8,0,8">
 
-                    <Border Classes="navPill" HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrAInicioCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=InicioViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
+                                    Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=InicioViewModel}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
                                     Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF015;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -53,30 +61,35 @@
                             <TextBlock Grid.Column="2" Text="Inicio" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
                                        FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=InicioViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <Border CornerRadius="12" Padding="6,5" Margin="12,3"
-                            Background="{StaticResource PillActiveBrush}"
-                            HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrAPropietariosCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=PropietariosViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
                             <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
                                     Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=PropietariosViewModel}"
                                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
-                                    Background="#26FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF1B0;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <TextBlock Grid.Column="2" Text="Propietarios y mascotas" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
-                                       FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
-                                       Foreground="{StaticResource PillTextBrush}"/>
+                                       FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=PropietariosViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <Border Classes="navPill" HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrAConsultasCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=ConsultasViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
+                                    Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=ConsultasViewModel}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
                                     Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF0F1;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -84,12 +97,17 @@
                             <TextBlock Grid.Column="2" Text="Consultas" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
                                        FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=ConsultasViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <Border Classes="navPill" HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrACitasCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=CitasViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
+                                    Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=CitasViewModel}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
                                     Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF073;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -97,12 +115,17 @@
                             <TextBlock Grid.Column="2" Text="Citas" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
                                        FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=CitasViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <Border Classes="navPill" HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrAPendientesCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=PendientesViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
+                                    Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=PendientesViewModel}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
                                     Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF017;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -110,12 +133,17 @@
                             <TextBlock Grid.Column="2" Text="Pendientes" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
                                        FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=PendientesViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <Border Classes="navPill" HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrAVacunasCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=VacunasViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
+                                    Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=VacunasViewModel}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
                                     Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF48E;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -123,12 +151,17 @@
                             <TextBlock Grid.Column="2" Text="Vacunas" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
                                        FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=VacunasViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
-                    <Border Classes="navPill" HorizontalAlignment="Stretch">
+                    <Button Classes="navPill" Command="{Binding IrAConfiguracionCommand}"
+                            Background="{Binding VistaActual, Converter={StaticResource VistaFondo}, ConverterParameter=ConfiguracionViewModel}">
                         <Grid ColumnDefinitions="3,Auto,*">
+                            <Border Grid.Column="0" Width="3" Height="24" CornerRadius="2"
+                                    Background="{StaticResource AccentBarBrush}"
+                                    Opacity="{Binding VistaActual, Converter={StaticResource VistaBarra}, ConverterParameter=ConfiguracionViewModel}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15"
                                     Background="#33FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="&#xF013;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons" FontSize="14" Foreground="{StaticResource PillIconBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -136,15 +169,15 @@
                             <TextBlock Grid.Column="2" Text="Configuración" Margin="12,0,0,0"
                                        VerticalAlignment="Center"
                                        FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
+                                       Foreground="{Binding VistaActual, Converter={StaticResource VistaTexto}, ConverterParameter=ConfiguracionViewModel}"/>
                         </Grid>
-                    </Border>
+                    </Button>
 
                 </StackPanel>
             </ScrollViewer>
 
             <Border Grid.Row="2" Padding="18,10" Background="#26000000">
-                <TextBlock Text="v0.1 · BLOO.paw · GSCode Solutions"
+                <TextBlock Text="v0.1 · PawDesk · GSCode Solutions"
                            FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
                            Foreground="{StaticResource NavyBrush}"
                            HorizontalAlignment="Center"/>
