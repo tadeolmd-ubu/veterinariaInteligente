@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using veterinariaInteligente.Models;
+using veterinariaInteligente.Models.Enums;
 using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
@@ -33,6 +34,9 @@ public partial class ConsultasViewModel : ObservableObject
     public ObservableCollection<Profesional> ProfesionalesItems { get; } = [];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarConsultaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArchivarConsultaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RestaurarConsultaCommand))]
     [NotifyPropertyChangedFor(nameof(PuedeEditar))]
     [NotifyPropertyChangedFor(nameof(PuedeArchivar))]
     [NotifyPropertyChangedFor(nameof(PuedeRestaurar))]
@@ -48,6 +52,9 @@ public partial class ConsultasViewModel : ObservableObject
     private string busquedaConsultas = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarConsultaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArchivarConsultaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RestaurarConsultaCommand))]
     [NotifyPropertyChangedFor(nameof(PuedeEditar))]
     [NotifyPropertyChangedFor(nameof(PuedeArchivar))]
     [NotifyPropertyChangedFor(nameof(PuedeRestaurar))]
@@ -72,11 +79,17 @@ public partial class ConsultasViewModel : ObservableObject
     private string mensajeOperacion = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarConsultaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArchivarConsultaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RestaurarConsultaCommand))]
+    [NotifyPropertyChangedFor(nameof(PuedeEditar))]
+    [NotifyPropertyChangedFor(nameof(PuedeArchivar))]
+    [NotifyPropertyChangedFor(nameof(PuedeRestaurar))]
     private bool isBusy;
 
-    public bool PuedeEditar => SelectedConsulta is not null && !MostrandoArchivadas;
-    public bool PuedeArchivar => SelectedConsulta is not null && !MostrandoArchivadas;
-    public bool PuedeRestaurar => SelectedConsulta is not null && MostrandoArchivadas;
+    public bool PuedeEditar => !IsBusy && SelectedConsulta is { Estado: not EstadoConsulta.Archivada } && !MostrandoArchivadas;
+    public bool PuedeArchivar => !IsBusy && SelectedConsulta is { Estado: not EstadoConsulta.Archivada } && !MostrandoArchivadas;
+    public bool PuedeRestaurar => !IsBusy && SelectedConsulta is { Estado: EstadoConsulta.Archivada } && MostrandoArchivadas;
 
     [RelayCommand]
     public Task CargarAsync() => EjecutarSeguroAsync(() => RecargarAsync());
@@ -94,6 +107,8 @@ public partial class ConsultasViewModel : ObservableObject
         SelectedMascota = MascotasItems.FirstOrDefault(m => m.Id == value.IdMascota);
         SelectedProfesional = ProfesionalesItems.FirstOrDefault(p => p.Id == value.IdProfesional);
     }
+
+    partial void OnMostrandoArchivadasChanged(bool value) => FiltrarConsultas();
 
     partial void OnBusquedaConsultasChanged(string value)
     {
@@ -133,7 +148,7 @@ public partial class ConsultasViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeEditar))]
     private async Task ActualizarConsultaAsync()
     {
         if (_consultaService is null || SelectedConsulta is null)
@@ -165,7 +180,7 @@ public partial class ConsultasViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeArchivar))]
     private async Task ArchivarConsultaAsync()
     {
         if (_consultaService is null || SelectedConsulta is null)
@@ -186,7 +201,7 @@ public partial class ConsultasViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeRestaurar))]
     private async Task RestaurarConsultaAsync()
     {
         if (_consultaService is null || SelectedConsulta is null)
@@ -244,6 +259,11 @@ public partial class ConsultasViewModel : ObservableObject
         var profesionales = await _profesionalService.ObtenerTodosAsync();
         var consultasActivas = await _consultaService.ObtenerTodosAsync();
         var consultasArchivadas = await _consultaService.ObtenerArchivadasAsync();
+        foreach (var consulta in consultasActivas)
+        {
+            var detalle = await _consultaService.ObtenerPorIdAsync(consulta.Id);
+            if (detalle is not null) consulta.Versiones = detalle.Versiones;
+        }
 
         ReemplazarItems(MascotasItems, mascotas.Where(m => m.IdEstado == 1));
         ReemplazarItems(ProfesionalesItems, profesionales);
@@ -259,7 +279,7 @@ public partial class ConsultasViewModel : ObservableObject
     private void FiltrarConsultas(int? consultaIdSeleccionada = null)
     {
         var idSeleccionado = consultaIdSeleccionada ?? SelectedConsulta?.Id;
-        var termino = BusquedaConsultas.Trim();
+        var termino = BusquedaConsultas?.Trim() ?? string.Empty;
         var origen = MostrandoArchivadas ? _consultasArchivadas : _consultasActivas;
 
         var consultasFiltradas = string.IsNullOrEmpty(termino)
