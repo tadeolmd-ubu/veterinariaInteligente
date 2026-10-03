@@ -57,6 +57,7 @@ public partial class ExpedienteViewModel : ObservableObject
             var resultado = await _consultaService.ObtenerExpedienteAsync(MascotaActual.Id);
             MensajeOperacion = resultado.Mensaje;
             ConsultasItems.Clear();
+            SelectedConsulta = null;
 
             if (!resultado.Correcta || resultado.Valor is null)
                 return;
@@ -68,6 +69,8 @@ public partial class ExpedienteViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            ConsultasItems.Clear();
+            SelectedConsulta = null;
             MensajeOperacion = $"No se pudo cargar el expediente: {ex.Message}";
         }
         finally
