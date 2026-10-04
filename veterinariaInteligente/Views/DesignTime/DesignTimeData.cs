@@ -16,6 +16,7 @@ public sealed class DesignTimeData
     public static readonly ConsultasDesignTime Consultas = new();
     public static readonly CitasDesignTime Citas = new();
     public static readonly PendientesDesignTime Pendientes = new();
+    public static readonly VacunasDesignTime Vacunas = new();
 }
 
 public class PropietariosDesignTime : PropietariosViewModel
@@ -544,4 +545,121 @@ public class PendientesDesignTime : PendientesViewModel
     public new ICommand MarcarRealizadoCommand => NoOp;
     public new ICommand CancelarSeguimientoCommand => NoOp;
     public new ICommand NuevoSeguimientoCommand => NoOp;
+}
+
+public class VacunasDesignTime : VacunasViewModel
+{
+    private static readonly RelayCommand NoOp = new(() => { });
+
+    public VacunasDesignTime()
+    {
+        var vacuna1 = new Vacuna { Id = 1, Nombre = "Antirrábica", Descripcion = "Protege contra la rabia.", Activo = 1 };
+        var vacuna2 = new Vacuna { Id = 2, Nombre = "Múltiple canina (pentavalente)", Descripcion = "Hepatitis, parvovirus, moquillo…", Activo = 1 };
+        var vacuna3 = new Vacuna { Id = 3, Nombre = "Triple felina", Descripcion = "Herpesvirus, calicivirus, panleucopenia.", Activo = 1 };
+        var vacuna4 = new Vacuna { Id = 4, Nombre = "Tos de las perreras", Descripcion = "En desuso por reacciones locales.", Activo = 0 };
+
+        var mascota1 = new Mascota { Id = 1, Nombre = "Rocky", Raza = "Labrador", Sexo = "Macho" };
+        var mascota2 = new Mascota { Id = 2, Nombre = "Luna", Raza = "Bulldog Francés", Sexo = "Hembra" };
+        var mascota3 = new Mascota { Id = 3, Nombre = "Dante", Raza = "Beagle", Sexo = "Macho" };
+
+        var profesional1 = new Profesional { Id = 1, Nombre = "Dra. Ana Ramírez", Cedula = "VET-10482", Activo = 1 };
+        var profesional2 = new Profesional { Id = 2, Nombre = "Dr. Luis Mendoza", Cedula = "VET-09176", Activo = 1 };
+
+        var aplicacion1 = new AplicacionVacuna
+        {
+            Id = 1,
+            FechaAplicacion = new DateOnly(2026, 9, 15),
+            Lote = "L-8821",
+            Observacion = "Sin reacciones adversas.",
+            FechaProximaSugerida = new DateOnly(2027, 9, 15),
+            IdVacuna = vacuna1.Id,
+            Vacuna = vacuna1,
+            IdMascota = mascota1.Id,
+            Mascota = mascota1,
+            IdProfesional = profesional1.Id,
+            Profesional = profesional1
+        };
+        var aplicacion2 = new AplicacionVacuna
+        {
+            Id = 2,
+            FechaAplicacion = new DateOnly(2026, 9, 20),
+            Lote = "L-9105",
+            Observacion = null,
+            FechaProximaSugerida = new DateOnly(2027, 9, 20),
+            IdVacuna = vacuna2.Id,
+            Vacuna = vacuna2,
+            IdMascota = mascota2.Id,
+            Mascota = mascota2,
+            IdProfesional = profesional1.Id,
+            Profesional = profesional1
+        };
+        var aplicacion3 = new AplicacionVacuna
+        {
+            Id = 3,
+            FechaAplicacion = new DateOnly(2026, 9, 28),
+            Lote = "L-9204",
+            Observacion = "Refuerzo en 12 meses.",
+            FechaProximaSugerida = new DateOnly(2027, 9, 28),
+            IdVacuna = vacuna3.Id,
+            Vacuna = vacuna3,
+            IdMascota = mascota3.Id,
+            Mascota = mascota3,
+            IdProfesional = profesional2.Id,
+            Profesional = profesional2
+        };
+
+        VacunasActivasItems = new ObservableCollection<Vacuna> { vacuna1, vacuna2, vacuna3 };
+        MascotasItems = new ObservableCollection<Mascota> { mascota1, mascota2, mascota3 };
+        ProfesionalesItems = new ObservableCollection<Profesional> { profesional1, profesional2 };
+        VacunasItems = new ObservableCollection<Vacuna> { vacuna1, vacuna2, vacuna3 };
+        AplicacionesItems = new ObservableCollection<AplicacionVacuna> { aplicacion1, aplicacion2, aplicacion3 };
+
+        SelectedVacuna = vacuna1;
+        SelectedVacunaAplicacion = vacuna1;
+        SelectedAplicacion = aplicacion1;
+        SelectedMascota = mascota1;
+        SelectedProfesional = profesional1;
+        FiltroMascota = null;
+
+        Nombre = "Antirrábica";
+        Descripcion = "Protege contra la rabia.";
+        Lote = "L-8821";
+        Observacion = "Sin reacciones adversas.";
+        FechaAplicacion = new DateTimeOffset(new DateTime(2026, 9, 15));
+        FechaProximaSugerida = new DateTimeOffset(new DateTime(2027, 9, 15));
+
+        MostrandoInactivas = false;
+        BusquedaVacunas = "";
+    }
+
+    public new ObservableCollection<Vacuna> VacunasItems { get; }
+    public new ObservableCollection<Vacuna> VacunasActivasItems { get; }
+    public new ObservableCollection<AplicacionVacuna> AplicacionesItems { get; }
+    public new ObservableCollection<Mascota> MascotasItems { get; }
+    public new ObservableCollection<Profesional> ProfesionalesItems { get; }
+
+    public new Vacuna? SelectedVacuna { get; set; }
+    public new Vacuna? SelectedVacunaAplicacion { get; set; }
+    public new AplicacionVacuna? SelectedAplicacion { get; set; }
+    public new Mascota? SelectedMascota { get; set; }
+    public new Mascota? FiltroMascota { get; set; }
+    public new Profesional? SelectedProfesional { get; set; }
+    public new string Nombre { get; set; }
+    public new string? Descripcion { get; set; }
+    public new string? Lote { get; set; }
+    public new string? Observacion { get; set; }
+    public new DateTimeOffset? FechaAplicacion { get; set; }
+    public new DateTimeOffset? FechaProximaSugerida { get; set; }
+    public new bool MostrandoInactivas { get; set; }
+    public new string BusquedaVacunas { get; set; }
+
+    public new ICommand CargarCommand => NoOp;
+    public new ICommand AgregarVacunaCommand => NoOp;
+    public new ICommand ActualizarVacunaCommand => NoOp;
+    public new ICommand DesactivarVacunaCommand => NoOp;
+    public new ICommand ActivarVacunaCommand => NoOp;
+    public new ICommand AgregarAplicacionCommand => NoOp;
+    public new ICommand ActualizarAplicacionCommand => NoOp;
+    public new ICommand NuevaVacunaCommand => NoOp;
+    public new ICommand NuevaAplicacionCommand => NoOp;
 }

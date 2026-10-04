@@ -29,6 +29,9 @@
         <DataTemplate DataType="vm:PendientesViewModel">
             <views:PendientesView/>
         </DataTemplate>
+        <DataTemplate DataType="vm:VacunasViewModel">
+            <views:VacunasView/>
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Grid ColumnDefinitions="262,*">

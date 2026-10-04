@@ -354,4 +354,25 @@
     <Style Selector="CheckBox.filtro:checked">
         <Setter Property="Foreground" Value="{StaticResource BrandCyanBrush}"/>
     </Style>
+
+    <Style Selector="ListBox.vacunasList ListBoxItem">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="Margin" Value="2,0,6,8"/>
+    </Style>
+    <Style Selector="ListBox.vacunasList ListBoxItem:pointerover">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+    <Style Selector="ListBox.vacunasList ListBoxItem:selected">
+        <Setter Property="Background" Value="#EAF6FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
+    <Style Selector="ListBox.vacunasList ListBoxItem:selected:pointerover">
+        <Setter Property="Background" Value="#EAF6FF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BrandCyanBrush}"/>
+    </Style>
 </Styles>
