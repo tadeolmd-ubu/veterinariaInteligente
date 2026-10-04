@@ -35,6 +35,9 @@
         <DataTemplate DataType="vm:ConfiguracionViewModel">
             <views:ConfiguracionView/>
         </DataTemplate>
+        <DataTemplate DataType="vm:InicioViewModel">
+            <views:InicioView/>
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Grid ColumnDefinitions="262,*">
