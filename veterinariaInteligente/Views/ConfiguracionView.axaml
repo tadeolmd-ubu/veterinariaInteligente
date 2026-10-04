@@ -3,88 +3,104 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             xmlns:models="using:veterinariaInteligente.Models"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Configuracion}"
-             x:DataType="dt:ConfiguracionDesignTime"
+             x:DataType="vm:ConfiguracionViewModel"
              x:Class="veterinariaInteligente.Views.ConfiguracionView">
 
     <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="20">
-
                 <StackPanel Spacing="3">
                     <TextBlock Text="Configuración" Classes="sectionTitle"/>
-                    <TextBlock Text="Datos de la veterinaria, horarios y preferencias del sistema" Classes="caption"/>
+                    <TextBlock Text="Profesionales, respaldos y documentos" Classes="caption"/>
                 </StackPanel>
 
-                <Border Classes="card" Padding="18,14" Background="#EAF6FF" BorderBrush="{StaticResource BrandCyanBrush}">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBlock Text="&#xF013;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
-                                   FontSize="20" Foreground="{StaticResource BrandCyanBrush}" VerticalAlignment="Center"/>
-                        <TextBlock Text="Preview de diseño: el ViewModel de configuración aún no está conectado. Esta pantalla se llenará con datos reales de la base cuando el módulo esté listo. Mueve la cola carlitos"
-                                   Classes="caption" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="#2F8FD1"/>
-                    </StackPanel>
-                </Border>
+                <Grid ColumnDefinitions="390,*" ColumnSpacing="22">
+                    <Border Classes="card" Padding="20,18">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Profesionales" Classes="subsection"/>
+                            <TextBox PlaceholderText="Buscar por nombre o cédula…"
+                                     Text="{Binding BusquedaProfesionales}"/>
+                            <CheckBox Classes="filtro" Content="Ver inactivos"
+                                      IsChecked="{Binding MostrandoInactivos}"/>
+                            <ListBox ItemsSource="{Binding ProfesionalesItems}"
+                                     SelectedItem="{Binding SelectedProfesional}"
+                                     MinHeight="180" MaxHeight="300">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Profesional">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="{Binding Nombre}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Cedula, TargetNullValue='Sin cédula'}" Classes="caption"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="22">
-
-                    <Border Classes="card" Padding="26,20">
+                    <Border Grid.Column="1" Classes="card" Padding="26,20">
                         <StackPanel Spacing="16">
-                            <TextBlock Text="Datos de la veterinaria" Classes="subsection"/>
-                            <Grid ColumnDefinitions="*,*" ColumnSpacing="14" RowDefinitions="Auto,Auto" RowSpacing="12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Datos del profesional" Classes="subsection"/>
+                                <Button Grid.Column="1" Classes="secondary small"
+                                        Command="{Binding NuevoProfesionalCommand}">Nuevo</Button>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="Nombre" Classes="fieldLabel"/>
-                                    <TextBlock Text="PawDesk" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                    <TextBox PlaceholderText="Nombre completo" Text="{Binding Nombre}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Spacing="5">
-                                    <TextBlock Text="Teléfono" Classes="fieldLabel"/>
-                                    <TextBlock Text="+52 667 000 0000" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Spacing="5">
-                                    <TextBlock Text="Dirección" Classes="fieldLabel"/>
-                                    <TextBlock Text="Av. Universidad 800, Culiacán, Sinaloa" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}" TextWrapping="Wrap"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
-                                    <TextBlock Text="Correo" Classes="fieldLabel"/>
-                                    <TextBlock Text="contacto@pawdesk.vet" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                    <TextBlock Text="Cédula" Classes="fieldLabel"/>
+                                    <TextBox PlaceholderText="Cédula profesional (opcional)" Text="{Binding Cedula}"/>
                                 </StackPanel>
                             </Grid>
+                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                <Button Classes="primary small" Command="{Binding AgregarProfesionalCommand}">Crear</Button>
+                                <Button Classes="primary small" Command="{Binding ActualizarProfesionalCommand}">Guardar</Button>
+                                <Button Classes="danger small" Command="{Binding DesactivarProfesionalCommand}">Desactivar</Button>
+                                <Button Classes="secondary small" Command="{Binding ActivarProfesionalCommand}">Activar</Button>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
-
-                    <Border Classes="card" Grid.Column="1" Padding="26,20">
-                        <StackPanel Spacing="16">
-                            <TextBlock Text="Horarios de atención" Classes="subsection"/>
-                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
-                                <StackPanel Spacing="5">
-                                    <TextBlock Text="Apertura" Classes="fieldLabel"/>
-                                    <TextBlock Text="08:00" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="5">
-                                    <TextBlock Text="Cierre" Classes="fieldLabel"/>
-                                    <TextBlock Text="18:00" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Spacing="5">
-                                    <TextBlock Text="Días" Classes="fieldLabel"/>
-                                    <TextBlock Text="Lun – Sáb" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
                 </Grid>
 
-                <Border Classes="card" Padding="26,20">
-                    <StackPanel Spacing="16">
-                        <TextBlock Text="Preferencias" Classes="subsection"/>
-                        <StackPanel Spacing="10">
-                            <CheckBox Classes="filtro" Content="Recordatorios de seguimientos y vacunas" IsChecked="True"/>
-                            <CheckBox Classes="filtro" Content="Notificaciones de citas próximas" IsChecked="True"/>
-                            <CheckBox Classes="filtro" Content="Recordatorios por correo" IsChecked="False"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="22">
+                    <Border Classes="card" Padding="26,20">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="Respaldo de la base de datos" Classes="subsection"/>
+                            <TextBox PlaceholderText="Carpeta de destino" Text="{Binding CarpetaRespaldo}"/>
+                            <Button Classes="primary small" HorizontalAlignment="Left"
+                                    Command="{Binding CrearRespaldoCommand}">Crear respaldo</Button>
+                            <TextBlock Text="{Binding RutaRespaldo, TargetNullValue=''}" Classes="caption" TextWrapping="Wrap"/>
                         </StackPanel>
-                    </StackPanel>
-                </Border>
+                    </Border>
 
+                    <Border Grid.Column="1" Classes="card" Padding="26,20">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="Generar documentos PDF" Classes="subsection"/>
+                            <ComboBox ItemsSource="{Binding MascotasItems}"
+                                      SelectedItem="{Binding SelectedMascota}"
+                                      DisplayMemberBinding="{Binding Nombre}"
+                                      PlaceholderText="Selecciona una mascota"/>
+                            <ComboBox ItemsSource="{Binding ConsultasItems}"
+                                      SelectedItem="{Binding SelectedConsulta}"
+                                      DisplayMemberBinding="{Binding Motivo}"
+                                      PlaceholderText="Selecciona una consulta"/>
+                            <WrapPanel ItemSpacing="8" LineSpacing="8">
+                                <Button Classes="primary small" Command="{Binding GenerarConsultaPdfCommand}">Consulta</Button>
+                                <Button Classes="primary small" Command="{Binding GenerarExpedientePdfCommand}">Expediente</Button>
+                                <Button Classes="primary small" Command="{Binding GenerarCartillaPdfCommand}">Cartilla</Button>
+                            </WrapPanel>
+                            <TextBlock Text="{Binding NombreArchivoPdf, TargetNullValue=''}" Classes="caption"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption" TextWrapping="Wrap"/>
             </StackPanel>
         </ScrollViewer>
     </Border>

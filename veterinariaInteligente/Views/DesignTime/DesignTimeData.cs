@@ -283,7 +283,7 @@ public class ConsultasDesignTime : ConsultasViewModel
         SelectedMascota = mascota1;
         SelectedProfesional = profesional1;
         MostrandoArchivadas = false;
-        Peso = "24,2";
+        PesoTexto = "24,2";
 
         BusquedaConsultas = "";
     }
@@ -291,8 +291,6 @@ public class ConsultasDesignTime : ConsultasViewModel
     public new ObservableCollection<Consulta> ConsultasItems { get; }
     public new ObservableCollection<Mascota> MascotasItems { get; }
     public new ObservableCollection<Profesional> ProfesionalesItems { get; }
-    public new string Peso { get; set; }
-
     public new ICommand AgregarConsultaCommand => NoOp;
     public new ICommand ActualizarConsultaCommand => NoOp;
     public new ICommand ArchivarConsultaCommand => NoOp;

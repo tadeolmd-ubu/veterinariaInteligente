@@ -7,7 +7,8 @@
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Pendientes}"
-             x:DataType="dt:PendientesDesignTime"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             x:DataType="vm:PendientesViewModel"
              x:Class="veterinariaInteligente.Views.PendientesView">
 
     <UserControl.Resources>
@@ -99,6 +100,7 @@
                                     <TextBlock Text="Detalle del seguimiento" Classes="subsection"/>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                                         <Button Classes="secondary small" Command="{Binding NuevoSeguimientoCommand}">Nueva</Button>
+                                        <Button Classes="primary small" Command="{Binding AgregarSeguimientoCommand}">Crear</Button>
                                         <Button Classes="primary small" Command="{Binding MarcarRealizadoCommand}">Marcar realizado</Button>
                                         <Button Classes="danger small" Command="{Binding CancelarSeguimientoCommand}">Cancelar</Button>
                                         <Button Classes="ghost small" Command="{Binding ActualizarSeguimientoCommand}">Guardar</Button>
