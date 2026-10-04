@@ -32,6 +32,9 @@
         <DataTemplate DataType="vm:VacunasViewModel">
             <views:VacunasView/>
         </DataTemplate>
+        <DataTemplate DataType="vm:ConfiguracionViewModel">
+            <views:ConfiguracionView/>
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Grid ColumnDefinitions="262,*">

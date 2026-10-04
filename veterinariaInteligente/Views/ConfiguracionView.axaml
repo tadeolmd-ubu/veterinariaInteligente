@@ -1,4 +1,91 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             d:DataContext="{x:Static dt:DesignTimeData.Configuracion}"
+             x:DataType="dt:ConfiguracionDesignTime"
              x:Class="veterinariaInteligente.Views.ConfiguracionView">
+
+    <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="20">
+
+                <StackPanel Spacing="3">
+                    <TextBlock Text="Configuración" Classes="sectionTitle"/>
+                    <TextBlock Text="Datos de la veterinaria, horarios y preferencias del sistema" Classes="caption"/>
+                </StackPanel>
+
+                <Border Classes="card" Padding="18,14" Background="#EAF6FF" BorderBrush="{StaticResource BrandCyanBrush}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="&#xF013;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                   FontSize="20" Foreground="{StaticResource BrandCyanBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Preview de diseño: el ViewModel de configuración aún no está conectado. Esta pantalla se llenará con datos reales de la base cuando el módulo esté listo. Mueve la cola carlitos"
+                                   Classes="caption" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="#2F8FD1"/>
+                    </StackPanel>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="22">
+
+                    <Border Classes="card" Padding="26,20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Datos de la veterinaria" Classes="subsection"/>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="14" RowDefinitions="Auto,Auto" RowSpacing="12">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Nombre" Classes="fieldLabel"/>
+                                    <TextBlock Text="PawDesk" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Teléfono" Classes="fieldLabel"/>
+                                    <TextBlock Text="+52 667 000 0000" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Spacing="5">
+                                    <TextBlock Text="Dirección" Classes="fieldLabel"/>
+                                    <TextBlock Text="Av. Universidad 800, Culiacán, Sinaloa" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Correo" Classes="fieldLabel"/>
+                                    <TextBlock Text="contacto@pawdesk.vet" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card" Grid.Column="1" Padding="26,20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Horarios de atención" Classes="subsection"/>
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Apertura" Classes="fieldLabel"/>
+                                    <TextBlock Text="08:00" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Cierre" Classes="fieldLabel"/>
+                                    <TextBlock Text="18:00" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Spacing="5">
+                                    <TextBlock Text="Días" Classes="fieldLabel"/>
+                                    <TextBlock Text="Lun – Sáb" Classes="caption" FontSize="14" Foreground="{StaticResource TextBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+
+                <Border Classes="card" Padding="26,20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Preferencias" Classes="subsection"/>
+                        <StackPanel Spacing="10">
+                            <CheckBox Classes="filtro" Content="Recordatorios de seguimientos y vacunas" IsChecked="True"/>
+                            <CheckBox Classes="filtro" Content="Notificaciones de citas próximas" IsChecked="True"/>
+                            <CheckBox Classes="filtro" Content="Recordatorios por correo" IsChecked="False"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:veterinariaInteligente.Styles"
              xmlns:models="using:veterinariaInteligente.Models"
+             xmlns:enums="using:veterinariaInteligente.Models.Enums"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Citas}"
@@ -180,8 +181,8 @@
                                                       SelectedItem="{Binding SelectedEstado}"
                                                       HorizontalAlignment="Stretch">
                                                 <ComboBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding, Converter={StaticResource EstCita}, ConverterParameter=nombre}"/>
+                                                    <DataTemplate x:DataType="enums:EstadoCita">
+                                                        <TextBlock Text="{Binding ., Converter={StaticResource EstCita}, ConverterParameter=nombre}"/>
                                                     </DataTemplate>
                                                 </ComboBox.ItemTemplate>
                                             </ComboBox>
