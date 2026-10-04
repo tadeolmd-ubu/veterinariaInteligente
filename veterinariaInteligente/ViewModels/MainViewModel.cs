@@ -17,7 +17,8 @@ public partial class MainViewModel : ObservableObject
         VacunasViewModel vacunasViewModel,
         ConsultasViewModel consultasViewModel,
         ConsultaService consultaService,
-        ConfiguracionViewModel configuracionViewModel)
+        ConfiguracionViewModel configuracionViewModel,
+        InicioViewModel inicioViewModel)
     {
         _propietariosViewModel = propietariosViewModel;
         _citasViewModel = citasViewModel;
@@ -26,6 +27,7 @@ public partial class MainViewModel : ObservableObject
         _consultasViewModel = consultasViewModel;
         _consultaService = consultaService;
         _configuracionViewModel = configuracionViewModel;
+        _inicioViewModel = inicioViewModel;
         _propietariosViewModel.ExpedienteSolicitado += MostrarExpediente;
         vistaActual = _propietariosViewModel;
         tituloVistaActual = "Propietarios y mascotas";
@@ -36,6 +38,7 @@ public partial class MainViewModel : ObservableObject
     private readonly PendientesViewModel _pendientesViewModel;
     private readonly VacunasViewModel _vacunasViewModel;
     private readonly ConfiguracionViewModel _configuracionViewModel;
+    private readonly InicioViewModel _inicioViewModel;
 
     [RelayCommand]
     private async Task IrAConfiguracionAsync()
@@ -94,10 +97,11 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void IrAInicio()
+    private async Task IrAInicioAsync()
     {
-        VistaActual = new InicioViewModel();
+        VistaActual = _inicioViewModel;
         TituloVistaActual = "Inicio";
+        await _inicioViewModel.CargarAsync();
     }
 
     private async void MostrarExpediente(Mascota mascota, Duenio duenio)
