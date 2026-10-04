@@ -15,6 +15,7 @@ public sealed class DesignTimeData
     public static readonly ExpedienteDesignTime Expediente = new();
     public static readonly ConsultasDesignTime Consultas = new();
     public static readonly CitasDesignTime Citas = new();
+    public static readonly PendientesDesignTime Pendientes = new();
 }
 
 public class PropietariosDesignTime : PropietariosViewModel
@@ -390,4 +391,157 @@ public class CitasDesignTime : CitasViewModel
     public new ICommand VerCitasActivasCommand => NoOp;
     public new ICommand VerCitasCanceladasCommand => NoOp;
     public new ICommand CargarAgendaCommand => NoOp;
+}
+
+public class PendientesDesignTime : PendientesViewModel
+{
+    private static readonly RelayCommand NoOp = new(() => { });
+
+    public PendientesDesignTime()
+    {
+        var mascota1 = new Mascota { Id = 1, Nombre = "Rocky", Raza = "Labrador", Sexo = "Macho" };
+        var mascota2 = new Mascota { Id = 2, Nombre = "Luna", Raza = "Bulldog Francés", Sexo = "Hembra" };
+        var mascota3 = new Mascota { Id = 3, Nombre = "Dante", Raza = "Beagle", Sexo = "Macho" };
+
+        MascotasItems = new ObservableCollection<Mascota> { mascota1, mascota2, mascota3 };
+        SelectedMascota = mascota1;
+
+        var consulta1 = new Consulta
+        {
+            Id = 1,
+            Motivo = "Control y seguimiento",
+            Estado = EstadoConsulta.EnCurso,
+            IdMascota = mascota1.Id,
+            Mascota = mascota1,
+            Versiones = new List<ConsultaVersion>()
+        };
+        var consulta2 = new Consulta
+        {
+            Id = 2,
+            Motivo = "Vacuna antirrábica",
+            Estado = EstadoConsulta.Finalizada,
+            IdMascota = mascota2.Id,
+            Mascota = mascota2,
+            Versiones = new List<ConsultaVersion>()
+        };
+        ConsultasItems = new ObservableCollection<Consulta> { consulta1, consulta2 };
+
+        var vacuna1 = new Vacuna { Id = 1, Nombre = "Antirrábica", Activo = 1 };
+        var vacuna2 = new Vacuna { Id = 2, Nombre = "Múltiple (triple felina)", Activo = 1 };
+        var aplicacion1 = new AplicacionVacuna
+        {
+            Id = 1,
+            FechaAplicacion = new DateOnly(2026, 9, 15),
+            IdVacuna = vacuna1.Id,
+            Vacuna = vacuna1,
+            IdMascota = mascota1.Id,
+            Mascota = mascota1
+        };
+        var aplicacion2 = new AplicacionVacuna
+        {
+            Id = 2,
+            FechaAplicacion = new DateOnly(2026, 9, 20),
+            IdVacuna = vacuna2.Id,
+            Vacuna = vacuna2,
+            IdMascota = mascota2.Id,
+            Mascota = mascota2
+        };
+        AplicacionesVacunaItems = new ObservableCollection<AplicacionVacuna> { aplicacion1, aplicacion2 };
+
+        var hoy = DateTime.Today;
+
+        SeguimientosItems = new ObservableCollection<Seguimiento>
+        {
+            new()
+            {
+                Id = 1,
+                Motivo = "Control dermatológico",
+                FechaPrevista = new DateOnly(hoy.AddDays(2).Year, hoy.AddDays(2).Month, hoy.AddDays(2).Day),
+                Notas = "Revisar zonas afectadas.",
+                Estado = EstadoSeguimiento.Pendiente,
+                IdMascota = mascota1.Id,
+                Mascota = mascota1,
+                IdConsultaOrigen = consulta1.Id,
+                ConsultaOrigen = consulta1
+            },
+            new()
+            {
+                Id = 2,
+                Motivo = "Refuerzo antirrábica",
+                FechaPrevista = DateOnly.FromDateTime(hoy),
+                Notas = "Coordinar con dueño.",
+                Estado = EstadoSeguimiento.Pendiente,
+                IdMascota = mascota2.Id,
+                Mascota = mascota2,
+                IdAplicacionVacunaOrigen = aplicacion2.Id,
+                AplicacionVacunaOrigen = aplicacion2
+            },
+            new()
+            {
+                Id = 3,
+                Motivo = "Control de peso",
+                FechaPrevista = DateOnly.FromDateTime(hoy.AddDays(-3)),
+                Notas = null,
+                Estado = EstadoSeguimiento.Pendiente,
+                IdMascota = mascota3.Id,
+                Mascota = mascota3
+            },
+            new()
+            {
+                Id = 4,
+                Motivo = "Vacuna anual",
+                FechaPrevista = DateOnly.FromDateTime(hoy.AddDays(-10)),
+                FechaRealizada = DateOnly.FromDateTime(hoy.AddDays(-8)),
+                Notas = "Sin reacciones.",
+                Estado = EstadoSeguimiento.Realizado,
+                IdMascota = mascota1.Id,
+                Mascota = mascota1
+            },
+            new()
+            {
+                Id = 5,
+                Motivo = "Desparasitación",
+                FechaPrevista = DateOnly.FromDateTime(hoy.AddDays(-1)),
+                Notas = "Cancelada por indecisión del dueño.",
+                Estado = EstadoSeguimiento.Cancelado,
+                IdMascota = mascota2.Id,
+                Mascota = mascota2
+            }
+        };
+
+        SelectedSeguimiento = SeguimientosItems[0];
+        Motivo = "Control dermatológico";
+        Notas = "Revisar zonas afectadas.";
+        FechaPrevista = DateTimeOffset.Now.Date.AddDays(2);
+        FechaRealizada = DateTimeOffset.Now.Date;
+        SelectedConsultaOrigen = consulta1;
+        SelectedAplicacionVacunaOrigen = aplicacion1;
+        BusquedaSeguimientos = "";
+        SoloPendientes = true;
+        SoloVencidos = false;
+    }
+
+    public new ObservableCollection<Seguimiento> SeguimientosItems { get; }
+    public new ObservableCollection<Mascota> MascotasItems { get; }
+    public new ObservableCollection<Consulta> ConsultasItems { get; }
+    public new ObservableCollection<AplicacionVacuna> AplicacionesVacunaItems { get; }
+
+    public new Seguimiento? SelectedSeguimiento { get; set; }
+    public new Mascota? SelectedMascota { get; set; }
+    public new string Motivo { get; set; }
+    public new string? Notas { get; set; }
+    public new DateTimeOffset? FechaPrevista { get; set; }
+    public new DateTimeOffset? FechaRealizada { get; set; }
+    public new string BusquedaSeguimientos { get; set; }
+    public new bool SoloPendientes { get; set; }
+    public new bool SoloVencidos { get; set; }
+    public new Consulta? SelectedConsultaOrigen { get; set; }
+    public new bool PuedeModificar => SelectedSeguimiento?.Estado == EstadoSeguimiento.Pendiente;
+
+    public new ICommand CargarCommand => NoOp;
+    public new ICommand AgregarSeguimientoCommand => NoOp;
+    public new ICommand ActualizarSeguimientoCommand => NoOp;
+    public new ICommand MarcarRealizadoCommand => NoOp;
+    public new ICommand CancelarSeguimientoCommand => NoOp;
+    public new ICommand NuevoSeguimientoCommand => NoOp;
 }
