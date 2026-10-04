@@ -1,4 +1,86 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             d:DataContext="{x:Static dt:DesignTimeData.Inicio}"
+             x:DataType="dt:InicioDesignTime"
              x:Class="veterinariaInteligente.Views.InicioView">
+
+    <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="20">
+
+                <StackPanel Spacing="3">
+                    <TextBlock Text="Inicio" Classes="sectionTitle"/>
+                    <TextBlock Text="Bienvenido a PawDesk — resumen general del sistema" Classes="caption"/>
+                </StackPanel>
+
+                <Border Classes="card" Padding="18,14" Background="#EAF6FF" BorderBrush="{StaticResource BrandCyanBrush}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="&#xF015;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                   FontSize="20" Foreground="{StaticResource BrandCyanBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Preview de diseño: el ViewModel de inicio aún no está conectado. Aquí se mostrarán métricas reales de la base cuando el módulo esté listo. Mueve la nagla carlitooooos"
+                                   Classes="caption" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="#2F8FD1"/>
+                    </StackPanel>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="16">
+
+                    <Border Classes="card" Padding="20,18">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="&#xF007;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                       FontSize="20" Foreground="{StaticResource BrandCyanBrush}"/>
+                            <TextBlock Text="Propietarios" Classes="caption"/>
+                            <TextBlock Text="0" FontSize="26" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Classes="card" Padding="20,18">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="&#xF1B0;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                       FontSize="20" Foreground="{StaticResource BrandCyanBrush}"/>
+                            <TextBlock Text="Mascotas" Classes="caption"/>
+                            <TextBlock Text="0" FontSize="26" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Classes="card" Padding="20,18">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="&#xF073;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                       FontSize="20" Foreground="{StaticResource BrandCyanBrush}"/>
+                            <TextBlock Text="Citas hoy" Classes="caption"/>
+                            <TextBlock Text="—" FontSize="26" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Classes="card" Padding="20,18">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="&#xF017;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                       FontSize="20" Foreground="{StaticResource BrandCyanBrush}"/>
+                            <TextBlock Text="Seguimientos vencidos" Classes="caption" TextWrapping="Wrap"/>
+                            <TextBlock Text="—" FontSize="26" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+
+                <Border Classes="card" Padding="26,20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Accesos rápidos" Classes="subsection"/>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Classes="chipTab" IsEnabled="False">Propietarios</Button>
+                            <Button Classes="chipTab" IsEnabled="False">Consultas</Button>
+                            <Button Classes="chipTab" IsEnabled="False">Citas</Button>
+                            <Button Classes="chipTab" IsEnabled="False">Pendientes</Button>
+                            <Button Classes="chipTab" IsEnabled="False">Vacunas</Button>
+                            <Button Classes="chipTab" IsEnabled="False">Configuración</Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 </UserControl>

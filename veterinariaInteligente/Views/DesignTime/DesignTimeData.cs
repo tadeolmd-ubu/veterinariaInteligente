@@ -18,6 +18,7 @@ public sealed class DesignTimeData
     public static readonly PendientesDesignTime Pendientes = new();
     public static readonly VacunasDesignTime Vacunas = new();
     public static readonly ConfiguracionDesignTime Configuracion = new();
+    public static readonly InicioDesignTime Inicio = new();
 }
 
 public class PropietariosDesignTime : PropietariosViewModel
@@ -666,5 +667,9 @@ public class VacunasDesignTime : VacunasViewModel
 }
 
 public class ConfiguracionDesignTime : ConfiguracionViewModel
+{
+}
+
+public class InicioDesignTime : InicioViewModel
 {
 }
