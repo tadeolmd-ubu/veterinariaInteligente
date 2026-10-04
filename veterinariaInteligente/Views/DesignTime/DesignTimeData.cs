@@ -14,6 +14,7 @@ public sealed class DesignTimeData
     public static readonly PropietariosDesignTime Propietarios = new();
     public static readonly ExpedienteDesignTime Expediente = new();
     public static readonly ConsultasDesignTime Consultas = new();
+    public static readonly CitasDesignTime Citas = new();
 }
 
 public class PropietariosDesignTime : PropietariosViewModel
@@ -295,4 +296,98 @@ public class ConsultasDesignTime : ConsultasViewModel
     public new ICommand NuevaConsultaCommand => NoOp;
     public new ICommand VerConsultasActivasCommand => NoOp;
     public new ICommand VerConsultasArchivadasCommand => NoOp;
+}
+
+public class CitasDesignTime : CitasViewModel
+{
+    private static readonly RelayCommand NoOp = new(() => { });
+
+    public CitasDesignTime()
+    {
+        var profesional1 = new Profesional { Id = 1, Nombre = "Dra. Ana Ramírez", Cedula = "VET-10482", Activo = 1 };
+        var profesional2 = new Profesional { Id = 2, Nombre = "Dr. Luis Mendoza", Cedula = "VET-09176", Activo = 1 };
+
+        var mascota1 = new Mascota { Id = 1, Nombre = "Rocky", Raza = "Labrador", Sexo = "Macho" };
+        var mascota2 = new Mascota { Id = 2, Nombre = "Luna", Raza = "Bulldog Francés", Sexo = "Hembra" };
+        var mascota3 = new Mascota { Id = 3, Nombre = "Dante", Raza = "Beagle", Sexo = "Macho" };
+
+        MascotasItems = new ObservableCollection<Mascota> { mascota1, mascota2, mascota3 };
+        ProfesionalesItems = new ObservableCollection<Profesional> { profesional1, profesional2 };
+
+        CitasItems = new ObservableCollection<Cita>
+        {
+            new()
+            {
+                Id = 1,
+                FechaPrevista = new DateTime(2026, 10, 4, 10, 30, 0),
+                Motivo = "Vacuna anual",
+                Notas = "Traer cartilla.",
+                Estado = EstadoCita.Confirmada,
+                IdMascota = mascota1.Id,
+                Mascota = mascota1,
+                IdProfesional = profesional1.Id,
+                Profesional = profesional1
+            },
+            new()
+            {
+                Id = 2,
+                FechaPrevista = new DateTime(2026, 10, 4, 11, 0, 0),
+                Motivo = "Control dermatológico",
+                Notas = null,
+                Estado = EstadoCita.Pendiente,
+                IdMascota = mascota3.Id,
+                Mascota = mascota3,
+                IdProfesional = profesional1.Id,
+                Profesional = profesional1
+            },
+            new()
+            {
+                Id = 3,
+                FechaPrevista = new DateTime(2026, 10, 6, 12, 15, 0),
+                Motivo = "Consulta por estornudos",
+                Notas = "Posible alergia alimentaria.",
+                Estado = EstadoCita.NoAsistio,
+                IdMascota = mascota2.Id,
+                Mascota = mascota2,
+                IdProfesional = profesional2.Id,
+                Profesional = profesional2
+            },
+            new()
+            {
+                Id = 4,
+                FechaPrevista = new DateTime(2026, 9, 28, 9, 0, 0),
+                Motivo = "Castración",
+                Notas = "Cancelada por el dueño.",
+                Estado = EstadoCita.Cancelada,
+                IdMascota = mascota1.Id,
+                Mascota = mascota1,
+                IdProfesional = profesional2.Id,
+                Profesional = profesional2
+            }
+        };
+
+        SelectedCita = CitasItems[1];
+        SelectedEstado = EstadoCita.Pendiente;
+        Motivo = "Control dermatológico";
+        Notas = "Revisar zonas afectadas.";
+        MostrandoCanceladas = false;
+        MostrandoAgenda = false;
+        BusquedaCitas = "";
+
+        AgendaDesde = DateTimeOffset.Now.Date;
+        AgendaHasta = DateTimeOffset.Now.Date.AddDays(7);
+    }
+
+    public new ObservableCollection<Cita> CitasItems { get; }
+    public new ObservableCollection<Mascota> MascotasItems { get; }
+    public new ObservableCollection<Profesional> ProfesionalesItems { get; }
+
+    public new ICommand AgregarCitaCommand => NoOp;
+    public new ICommand ActualizarCitaCommand => NoOp;
+    public new ICommand CambiarEstadoCitaCommand => NoOp;
+    public new ICommand CancelarCitaCommand => NoOp;
+    public new ICommand NuevaCitaCommand => NoOp;
+    public new ICommand VerCitasActivasCommand => NoOp;
+    public new ICommand VerCitasCanceladasCommand => NoOp;
+    public new ICommand CargarAgendaCommand => NoOp;
 }

@@ -17,16 +17,6 @@
         <conv:TabEstadoConverter x:Key="TabTexto" EsFondo="False"/>
     </UserControl.Resources>
 
-    <UserControl.Styles>
-        <Style Selector="Button.chipTab">
-            <Setter Property="CornerRadius" Value="999"/>
-            <Setter Property="Padding" Value="14,7"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderStrongBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-    </UserControl.Styles>
-
     <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
         <Grid RowDefinitions="Auto,*" RowSpacing="20">
 

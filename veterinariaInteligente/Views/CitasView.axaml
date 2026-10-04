@@ -1,4 +1,215 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:models="using:veterinariaInteligente.Models"
+             xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             d:DataContext="{x:Static dt:DesignTimeData.Citas}"
+             x:DataType="dt:CitasDesignTime"
              x:Class="veterinariaInteligente.Views.CitasView">
+
+    <UserControl.Resources>
+        <conv:InicialesConverter x:Key="Iniciales"/>
+        <conv:EstadoCitaConverter x:Key="EstCita"/>
+        <conv:CitasTabConverter x:Key="CitasTabFondo" EsFondo="True"/>
+        <conv:CitasTabConverter x:Key="CitasTabTexto" EsFondo="False"/>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
+        <Grid RowDefinitions="Auto,*" RowSpacing="20">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="Citas" Classes="sectionTitle"/>
+                    <TextBlock Text="Agenda de atenciones y citas programadas" Classes="caption"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Classes="primary" Command="{Binding NuevaCitaCommand}">Nueva cita</Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="390,*" ColumnSpacing="22">
+
+                <Border Classes="card" Grid.Column="0" Padding="0">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+                        <TextBlock Text="Citas" Classes="subsection" Margin="20,18,20,0"/>
+
+                        <StackPanel Grid.Row="1" Margin="20,12,20,0" Spacing="10">
+                            <TextBox PlaceholderText="Buscar por motivo o mascota…"
+                                     Text="{Binding BusquedaCitas}"/>
+                            <StackPanel Spacing="6" IsVisible="{Binding MostrandoAgenda}">
+                                <TextBlock Text="Rango de la agenda" Classes="fieldLabel"/>
+                                <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                                    <DatePicker SelectedDate="{Binding AgendaDesde}"/>
+                                    <DatePicker Grid.Column="1" SelectedDate="{Binding AgendaHasta}"/>
+                                    <Button Grid.Column="2" Classes="secondary small"
+                                            Command="{Binding CargarAgendaCommand}">Actualizar</Button>
+                                </Grid>
+                            </StackPanel>
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <Button Classes="chipTab" Command="{Binding VerCitasActivasCommand}">
+                                    <Button.Background>
+                                        <MultiBinding Converter="{StaticResource CitasTabFondo}" ConverterParameter="activas">
+                                            <Binding Path="MostrandoAgenda"/>
+                                            <Binding Path="MostrandoCanceladas"/>
+                                        </MultiBinding>
+                                    </Button.Background>
+                                    <Button.Foreground>
+                                        <MultiBinding Converter="{StaticResource CitasTabTexto}" ConverterParameter="activas">
+                                            <Binding Path="MostrandoAgenda"/>
+                                            <Binding Path="MostrandoCanceladas"/>
+                                        </MultiBinding>
+                                    </Button.Foreground>
+                                    Activas
+                                </Button>
+                                <Button Grid.Column="1" Classes="chipTab" Command="{Binding CargarAgendaCommand}">
+                                    <Button.Background>
+                                        <MultiBinding Converter="{StaticResource CitasTabFondo}" ConverterParameter="agenda">
+                                            <Binding Path="MostrandoAgenda"/>
+                                            <Binding Path="MostrandoCanceladas"/>
+                                        </MultiBinding>
+                                    </Button.Background>
+                                    <Button.Foreground>
+                                        <MultiBinding Converter="{StaticResource CitasTabTexto}" ConverterParameter="agenda">
+                                            <Binding Path="MostrandoAgenda"/>
+                                            <Binding Path="MostrandoCanceladas"/>
+                                        </MultiBinding>
+                                    </Button.Foreground>
+                                    Agenda
+                                </Button>
+                                <Button Grid.Column="2" Classes="chipTab" Command="{Binding VerCitasCanceladasCommand}">
+                                    <Button.Background>
+                                        <MultiBinding Converter="{StaticResource CitasTabFondo}" ConverterParameter="canceladas">
+                                            <Binding Path="MostrandoAgenda"/>
+                                            <Binding Path="MostrandoCanceladas"/>
+                                        </MultiBinding>
+                                    </Button.Background>
+                                    <Button.Foreground>
+                                        <MultiBinding Converter="{StaticResource CitasTabTexto}" ConverterParameter="canceladas">
+                                            <Binding Path="MostrandoAgenda"/>
+                                            <Binding Path="MostrandoCanceladas"/>
+                                        </MultiBinding>
+                                    </Button.Foreground>
+                                    Canceladas
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="2" Text="Selecciona una cita"
+                                   Classes="caption" Margin="20,10,20,0"/>
+
+                        <ListBox Grid.Row="3" Classes="citasList" Margin="8,6,8,12"
+                                 ItemsSource="{Binding CitasItems}"
+                                 SelectedItem="{Binding SelectedCita}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:Cita">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                        <Border Width="42" Height="42" CornerRadius="21"
+                                                Background="{StaticResource PrimaryButtonBrush}">
+                                            <TextBlock Text="{Binding Mascota.Nombre, Converter={StaticResource Iniciales}}"
+                                                       FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                                       Foreground="{StaticResource SurfaceBrush}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding Motivo}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Classes="caption" TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} · {1:dd/MM/yyyy HH:mm}">
+                                                        <Binding Path="Mascota.Nombre"/>
+                                                        <Binding Path="FechaPrevista"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
+                                                Background="{Binding Estado, Converter={StaticResource EstCita}, ConverterParameter=fondo}">
+                                            <TextBlock Text="{Binding Estado, Converter={StaticResource EstCita}, ConverterParameter=nombre}"
+                                                       FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       Foreground="{Binding Estado, Converter={StaticResource EstCita}, ConverterParameter=texto}"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="22" Margin="0,0,0,8">
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="16">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="Detalle de la cita" Classes="subsection"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="secondary small" Command="{Binding NuevaCitaCommand}">Nueva</Button>
+                                        <Button Classes="danger small" Command="{Binding CancelarCitaCommand}">Cancelar cita</Button>
+                                        <Button Classes="primary small" Command="{Binding ActualizarCitaCommand}">Guardar</Button>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="Mascota" Classes="fieldLabel"/>
+                                        <ComboBox ItemsSource="{Binding MascotasItems}"
+                                                  SelectedItem="{Binding SelectedMascota}"
+                                                  DisplayMemberBinding="{Binding Nombre}"
+                                                  HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="5">
+                                        <TextBlock Text="Veterinario" Classes="fieldLabel"/>
+                                        <ComboBox ItemsSource="{Binding ProfesionalesItems}"
+                                                  SelectedItem="{Binding SelectedProfesional}"
+                                                  DisplayMemberBinding="{Binding Nombre}"
+                                                  HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Spacing="5">
+                                        <TextBlock Text="Fecha prevista" Classes="fieldLabel"/>
+                                        <DatePicker SelectedDate="{Binding FechaPrevista}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
+                                        <TextBlock Text="Estado" Classes="fieldLabel"/>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <ComboBox ItemsSource="{Binding EstadosCitaItems}"
+                                                      SelectedItem="{Binding SelectedEstado}"
+                                                      HorizontalAlignment="Stretch">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding, Converter={StaticResource EstCita}, ConverterParameter=nombre}"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                            <Button Grid.Column="1" Classes="secondary small"
+                                                    Command="{Binding CambiarEstadoCitaCommand}">Aplicar</Button>
+                                        </Grid>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Motivo" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Motivo de la cita" Text="{Binding Motivo}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Notas" Classes="fieldLabel"/>
+                                        <TextBox PlaceholderText="Notas (opcional)"
+                                                 Text="{Binding Notas}"
+                                                 AcceptsReturn="True" TextWrapping="Wrap" Height="88"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+            </Grid>
+        </Grid>
+    </Border>
 </UserControl>
