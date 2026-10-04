@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using veterinariaInteligente.Models;
@@ -67,6 +68,11 @@ public partial class ConsultasViewModel : ObservableObject
     private decimal? peso;
 
     [ObservableProperty]
+    private string pesoTexto = string.Empty;
+
+    private bool _actualizandoPesoDesdeTexto;
+
+    [ObservableProperty]
     private string observacion = string.Empty;
 
     [ObservableProperty]
@@ -109,6 +115,26 @@ public partial class ConsultasViewModel : ObservableObject
     }
 
     partial void OnMostrandoArchivadasChanged(bool value) => FiltrarConsultas();
+
+    partial void OnPesoTextoChanged(string value)
+    {
+        var textoNormalizado = value.Trim().Replace(',', '.');
+        var pesoValido = decimal.TryParse(
+            textoNormalizado,
+            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+            CultureInfo.InvariantCulture,
+            out var nuevoPeso);
+
+        _actualizandoPesoDesdeTexto = true;
+        Peso = pesoValido ? nuevoPeso : null;
+        _actualizandoPesoDesdeTexto = false;
+    }
+
+    partial void OnPesoChanged(decimal? value)
+    {
+        if (!_actualizandoPesoDesdeTexto)
+            PesoTexto = value?.ToString("0.###", CultureInfo.CurrentCulture) ?? string.Empty;
+    }
 
     partial void OnBusquedaConsultasChanged(string value)
     {

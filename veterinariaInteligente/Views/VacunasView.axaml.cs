@@ -9,9 +9,7 @@ public partial class VacunasView : UserControl
     {
         InitializeComponent();
 
-#if DEBUG
-        if (DataContext is null)
+        if (Design.IsDesignMode)
             DataContext = DesignTimeData.Vacunas;
-#endif
     }
 }

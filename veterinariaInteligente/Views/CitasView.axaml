@@ -8,7 +8,8 @@
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Citas}"
-             x:DataType="dt:CitasDesignTime"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             x:DataType="vm:CitasViewModel"
              x:Class="veterinariaInteligente.Views.CitasView">
 
     <UserControl.Resources>
@@ -151,6 +152,7 @@
                                     <TextBlock Text="Detalle de la cita" Classes="subsection"/>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                                         <Button Classes="secondary small" Command="{Binding NuevaCitaCommand}">Nueva</Button>
+                                        <Button Classes="primary small" Command="{Binding AgregarCitaCommand}">Crear</Button>
                                         <Button Classes="danger small" Command="{Binding CancelarCitaCommand}">Cancelar cita</Button>
                                         <Button Classes="primary small" Command="{Binding ActualizarCitaCommand}">Guardar</Button>
                                     </StackPanel>

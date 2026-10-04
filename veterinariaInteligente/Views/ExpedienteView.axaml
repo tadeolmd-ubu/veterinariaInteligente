@@ -6,7 +6,8 @@
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Expediente}"
-             x:DataType="dt:ExpedienteDesignTime"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             x:DataType="vm:ExpedienteViewModel"
              x:Class="veterinariaInteligente.Views.ExpedienteView">
 
     <UserControl.Resources>

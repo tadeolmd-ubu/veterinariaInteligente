@@ -9,9 +9,7 @@ public partial class CitasView : UserControl
     {
         InitializeComponent();
 
-#if DEBUG
-        if (DataContext is null)
+        if (Design.IsDesignMode)
             DataContext = DesignTimeData.Citas;
-#endif
     }
 }

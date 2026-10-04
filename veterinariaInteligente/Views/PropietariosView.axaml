@@ -7,7 +7,8 @@
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Propietarios}"
-             x:DataType="dt:PropietariosDesignTime"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             x:DataType="vm:PropietariosViewModel"
              x:Class="veterinariaInteligente.Views.PropietariosView">
 
     <UserControl.Resources>
@@ -23,8 +24,8 @@
                     <TextBlock Text="Gestión de propietarios y sus mascotas" Classes="caption"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                    <Button Classes="secondary small" Command="{Binding RestaurarPropietarioCommand}">Restaurar</Button>
-                    <Button Classes="primary" Command="{Binding AgregarPropietarioCommand}">Nuevo propietario</Button>
+                    <CheckBox Classes="filtro" Content="Ver archivados" IsChecked="{Binding MostrandoArchivados}"/>
+                    <Button Classes="secondary small" Command="{Binding RestaurarPropietarioCommand}">Restaurar seleccionado</Button>
                 </StackPanel>
             </Grid>
 
@@ -78,6 +79,25 @@
 
                         <Border Classes="card">
                             <StackPanel Spacing="16">
+                                <TextBlock Text="Nuevo propietario" Classes="subsection"/>
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                                    <TextBox PlaceholderText="Nombre del nuevo propietario"
+                                             Text="{Binding NuevoPropietarioNombre}"/>
+                                    <TextBox Grid.Column="1" PlaceholderText="Teléfono del nuevo propietario"
+                                             Text="{Binding NuevoPropietarioTelefono}"/>
+                                    <TextBox Grid.Row="1" PlaceholderText="Correo del nuevo propietario (opcional)"
+                                             Text="{Binding NuevoPropietarioCorreo}"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" PlaceholderText="Dirección del nuevo propietario (opcional)"
+                                             Text="{Binding NuevoPropietarioDireccion}"/>
+                                </Grid>
+                                <Button Classes="primary small" HorizontalAlignment="Right"
+                                        Command="{Binding AgregarPropietarioCommand}">Guardar nuevo propietario</Button>
+                                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="card">
+                            <StackPanel Spacing="16">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Text="Datos del propietario" Classes="subsection"/>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
@@ -107,6 +127,7 @@
                                                  Text="{Binding SelectedPropietario.Direccion}"/>
                                     </StackPanel>
                                 </Grid>
+                                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                             </StackPanel>
                         </Border>
 

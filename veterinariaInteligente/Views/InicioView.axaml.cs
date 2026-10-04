@@ -9,9 +9,7 @@ public partial class InicioView : UserControl
     {
         InitializeComponent();
 
-#if DEBUG
-        if (DataContext is null)
+        if (Design.IsDesignMode)
             DataContext = DesignTimeData.Inicio;
-#endif
     }
 }

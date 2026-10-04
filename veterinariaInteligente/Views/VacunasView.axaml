@@ -7,7 +7,8 @@
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Vacunas}"
-             x:DataType="dt:VacunasDesignTime"
+             xmlns:vm="using:veterinariaInteligente.ViewModels"
+             x:DataType="vm:VacunasViewModel"
              x:Class="veterinariaInteligente.Views.VacunasView">
 
     <UserControl.Resources>
@@ -89,6 +90,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <Button Classes="secondary small" Command="{Binding NuevaVacunaCommand}">Nueva</Button>
+                                <Button Classes="primary small" Command="{Binding AgregarVacunaCommand}">Crear</Button>
                                 <Button Classes="primary small" Command="{Binding ActualizarVacunaCommand}">Guardar</Button>
                                 <Button Classes="danger small" Command="{Binding DesactivarVacunaCommand}">Desactivar</Button>
                                 <Button Classes="primary small" Command="{Binding ActivarVacunaCommand}">Activar</Button>
