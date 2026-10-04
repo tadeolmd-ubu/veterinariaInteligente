@@ -50,7 +50,9 @@ public partial class App : Application
                 new VacunasViewModel(new VacunaService(dbContext),
                     new AplicacionVacunaService(dbContext), mascotaService, profesionalService),
                 consultasViewModel,
-                consultaService);
+                consultaService,
+                new ConfiguracionViewModel(profesionalService, new RespaldoService(dbContext),
+                    new PdfService(dbContext), mascotaService, consultaService));
 
             var mainWindow = new MainWindow
             {
