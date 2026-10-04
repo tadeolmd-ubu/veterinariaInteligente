@@ -118,6 +118,54 @@ public class EstadoCitaConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public class EstadoSeguimientoConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not EstadoSeguimiento estado)
+            return null;
+
+        var parametro = parameter?.ToString();
+
+        if (parametro == "nombre")
+            return estado switch
+            {
+                EstadoSeguimiento.Pendiente => "Pendiente",
+                EstadoSeguimiento.Realizado => "Realizado",
+                EstadoSeguimiento.Cancelado => "Cancelado",
+                _ => estado.ToString()
+            };
+
+        var (fondo, texto) = estado switch
+        {
+            EstadoSeguimiento.Pendiente => ("#FFF4E0", "#A8701B"),
+            EstadoSeguimiento.Realizado => ("#EAFCEF", "#2EBD85"),
+            EstadoSeguimiento.Cancelado => ("#EEF2F6", "#5C6F80"),
+            _ => ("#EEF2F6", "#5C6F80")
+        };
+
+        return new SolidColorBrush(Color.Parse(parametro == "texto" ? texto : fondo));
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+public class FechaCortaConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value switch
+        {
+            DateOnly fecha => fecha.ToString("dd/MM/yyyy"),
+            DateTimeOffset fecha => fecha.ToString("dd/MM/yyyy"),
+            DateTime fecha => fecha.ToString("dd/MM/yyyy"),
+            _ => "—"
+        };
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 public class CitasTabConverter : IMultiValueConverter
 {
     public bool EsFondo { get; set; }

@@ -26,6 +26,9 @@
         <DataTemplate DataType="vm:CitasViewModel">
             <views:CitasView/>
         </DataTemplate>
+        <DataTemplate DataType="vm:PendientesViewModel">
+            <views:PendientesView/>
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Grid ColumnDefinitions="262,*">
