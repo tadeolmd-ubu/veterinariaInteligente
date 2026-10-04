@@ -23,6 +23,9 @@
         <DataTemplate DataType="vm:ConsultasViewModel">
             <views:ConsultasView/>
         </DataTemplate>
+        <DataTemplate DataType="vm:CitasViewModel">
+            <views:CitasView/>
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Grid ColumnDefinitions="262,*">
