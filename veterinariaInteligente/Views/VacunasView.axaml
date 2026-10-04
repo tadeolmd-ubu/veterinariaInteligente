@@ -1,0 +1,217 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:models="using:veterinariaInteligente.Models"
+             xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             d:DataContext="{x:Static dt:DesignTimeData.Vacunas}"
+             x:DataType="dt:VacunasDesignTime"
+             x:Class="veterinariaInteligente.Views.VacunasView">
+
+    <UserControl.Resources>
+        <conv:InicialesConverter x:Key="Iniciales"/>
+        <conv:FechaCortaConverter x:Key="FechaCorta"/>
+        <conv:VacunaEstadoConverter x:Key="EstVacuna"/>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
+        <Grid RowDefinitions="Auto,*" RowSpacing="20">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="3">
+                    <TextBlock Text="Vacunas" Classes="sectionTitle"/>
+                    <TextBlock Text="Catálogo de vacunas y aplicaciones por mascota" Classes="caption"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Classes="primary" Command="{Binding NuevaVacunaCommand}">Nueva vacuna</Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="22">
+
+                <Border Classes="card" Grid.Column="0" Padding="26,18">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="10">
+
+                        <TextBlock Text="Catálogo de vacunas" Classes="subsection"/>
+
+                        <StackPanel Grid.Row="1" Spacing="8">
+                            <TextBox PlaceholderText="Buscar por nombre…" Text="{Binding BusquedaVacunas}"/>
+                            <CheckBox Classes="filtro" Content="Ver inactivas"
+                                      IsChecked="{Binding MostrandoInactivas}"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="2" Text="Selecciona una vacuna" Classes="caption"/>
+
+                        <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4"
+                                 ItemsSource="{Binding VacunasItems}"
+                                 SelectedItem="{Binding SelectedVacuna}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:Vacuna">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                        <Border Width="42" Height="42" CornerRadius="21"
+                                                Background="{StaticResource PrimaryButtonBrush}">
+                                            <TextBlock Text="&#xF48E;" FontFamily="avares://veterinariaInteligente/Assets/Fonts/BLOO-Icons.ttf#BLOO Icons"
+                                                       FontSize="16" Foreground="{StaticResource SurfaceBrush}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Classes="caption" Text="{Binding Descripcion}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
+                                                Background="{Binding Activo, Converter={StaticResource EstVacuna}, ConverterParameter=fondo}">
+                                            <TextBlock Text="{Binding Activo, Converter={StaticResource EstVacuna}, ConverterParameter=nombre}"
+                                                       FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       Foreground="{Binding Activo, Converter={StaticResource EstVacuna}, ConverterParameter=texto}"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Border Grid.Row="4" Background="{StaticResource BorderBrush}" Height="1" Margin="0,4"/>
+
+                        <StackPanel Grid.Row="5" Spacing="12">
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Nombre" Classes="fieldLabel"/>
+                                <TextBox PlaceholderText="Nombre de la vacuna" Text="{Binding Nombre}"/>
+                            </StackPanel>
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Descripción" Classes="fieldLabel"/>
+                                <TextBox PlaceholderText="Descripción (opcional)"
+                                         Text="{Binding Descripcion}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="64"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Classes="secondary small" Command="{Binding NuevaVacunaCommand}">Nueva</Button>
+                                <Button Classes="primary small" Command="{Binding ActualizarVacunaCommand}">Guardar</Button>
+                                <Button Classes="danger small" Command="{Binding DesactivarVacunaCommand}">Desactivar</Button>
+                                <Button Classes="primary small" Command="{Binding ActivarVacunaCommand}">Activar</Button>
+                            </StackPanel>
+                            <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
+                        </StackPanel>
+
+                    </Grid>
+                </Border>
+
+                <Border Classes="card" Grid.Column="1" Padding="26,18">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="10">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Aplicaciones" Classes="subsection"/>
+                            <Button Grid.Column="1" Classes="secondary small"
+                                    Command="{Binding NuevaAplicacionCommand}">Aplicar vacuna</Button>
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" Spacing="5">
+                            <TextBlock Text="Filtrar por mascota" Classes="fieldLabel"/>
+                            <ComboBox ItemsSource="{Binding MascotasItems}"
+                                      SelectedItem="{Binding FiltroMascota}"
+                                      DisplayMemberBinding="{Binding Nombre}"
+                                      HorizontalAlignment="Stretch"
+                                      PlaceholderText="Todas las mascotas"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="2" Text="Selecciona una aplicación" Classes="caption"/>
+
+                        <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4"
+                                 ItemsSource="{Binding AplicacionesItems}"
+                                 SelectedItem="{Binding SelectedAplicacion}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:AplicacionVacuna">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                        <Border Width="42" Height="42" CornerRadius="21"
+                                                Background="{StaticResource BrandCyanBrush}">
+                                            <TextBlock Text="{Binding Mascota.Nombre, Converter={StaticResource Iniciales}}"
+                                                       FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                                       Foreground="{StaticResource SurfaceBrush}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding Vacuna.Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Classes="caption" TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} · {1:dd/MM/yyyy}">
+                                                        <Binding Path="Mascota.Nombre"/>
+                                                        <Binding Path="FechaAplicacion"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock Classes="caption" Text="{Binding FechaProximaSugerida, Converter={StaticResource FechaCorta}, StringFormat=Próxima: {0}}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Border Grid.Row="4" Background="{StaticResource BorderBrush}" Height="1" Margin="0,4"/>
+
+                        <StackPanel Grid.Row="5" Spacing="12">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Vacuna" Classes="fieldLabel"/>
+                                    <ComboBox ItemsSource="{Binding VacunasActivasItems}"
+                                              SelectedItem="{Binding SelectedVacunaAplicacion}"
+                                              DisplayMemberBinding="{Binding Nombre}"
+                                              HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Mascota" Classes="fieldLabel"/>
+                                    <ComboBox ItemsSource="{Binding MascotasItems}"
+                                              SelectedItem="{Binding SelectedMascota}"
+                                              DisplayMemberBinding="{Binding Nombre}"
+                                              HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Veterinario" Classes="fieldLabel"/>
+                                    <ComboBox ItemsSource="{Binding ProfesionalesItems}"
+                                              SelectedItem="{Binding SelectedProfesional}"
+                                              DisplayMemberBinding="{Binding Nombre}"
+                                              HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Fecha de aplicación" Classes="fieldLabel"/>
+                                    <DatePicker SelectedDate="{Binding FechaAplicacion}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Próx. sugerida (opcional)" Classes="fieldLabel"/>
+                                    <DatePicker SelectedDate="{Binding FechaProximaSugerida}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Lote" Classes="fieldLabel"/>
+                                    <TextBox PlaceholderText="Lote" Text="{Binding Lote}"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Observación" Classes="fieldLabel"/>
+                                <TextBox PlaceholderText="Observación (opcional)"
+                                         Text="{Binding Observacion}"
+                                         AcceptsReturn="True" TextWrapping="Wrap" Height="56"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Classes="secondary small" Command="{Binding NuevaAplicacionCommand}">Nueva</Button>
+                                <Button Classes="primary small" Command="{Binding AgregarAplicacionCommand}">Aplicar</Button>
+                                <Button Classes="ghost small" Command="{Binding ActualizarAplicacionCommand}">Guardar</Button>
+                            </StackPanel>
+                            <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
+                        </StackPanel>
+
+                    </Grid>
+                </Border>
+
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

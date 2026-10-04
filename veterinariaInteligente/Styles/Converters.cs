@@ -166,6 +166,28 @@ public class FechaCortaConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public class VacunaEstadoConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not int activo)
+            return null;
+
+        var parametro = parameter?.ToString();
+        var activa = activo == 1;
+
+        return parametro switch
+        {
+            "nombre" => activa ? "Activa" : "Inactiva",
+            "texto" => new SolidColorBrush(Color.Parse(activa ? "#2EBD85" : "#5C6F80")),
+            _ => new SolidColorBrush(Color.Parse(activa ? "#EAFCEF" : "#EEF2F6"))
+        };
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 public class CitasTabConverter : IMultiValueConverter
 {
     public bool EsFondo { get; set; }
