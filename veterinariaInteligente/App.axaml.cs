@@ -1,10 +1,14 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.EntityFrameworkCore;
 using veterinariaInteligente.Data;
 using veterinariaInteligente.Service;
 using veterinariaInteligente.ViewModels;
+using veterinariaInteligente.Views;
+using Microsoft.Data.Sqlite;
+using System.Diagnostics;
 
 namespace veterinariaInteligente;
 
@@ -19,10 +23,28 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var rutaBaseDatos = ResolverRutaBaseDatos();
+            string rutaBaseDatos;
+            try
+            {
+                rutaBaseDatos = ResolverRutaBaseDatos();
+            }
+            catch (Exception ex)
+            {
+                desktop.MainWindow = new Window
+                {
+                    Title = "Error al iniciar PawDesk", Width = 600, Height = 200,
+                    Content = new TextBlock
+                    {
+                        Text = $"No se pudo preparar la base de datos: {ex.Message}",
+                        TextWrapping = Avalonia.Media.TextWrapping.Wrap, Margin = new Thickness(24)
+                    }
+                };
+                base.OnFrameworkInitializationCompleted();
+                return;
+            }
 
             var opciones = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite($"Data Source={rutaBaseDatos}")
+                .UseSqlite(new SqliteConnectionStringBuilder { DataSource = rutaBaseDatos }.ToString())
                 .Options;
 
             var dbContext = new AppDbContext(opciones);
@@ -61,7 +83,50 @@ public partial class App : Application
                 DataContext = mainViewModel
             };
 
-            mainWindow.Opened += async (_, _) => await mainViewModel.InicializarAsync();
+            mainWindow.IsEnabled = false;
+            mainWindow.Opened += async (_, _) =>
+            {
+                try
+                {
+                    if (File.Exists(rutaBaseDatos) &&
+                        (await dbContext.Database.GetPendingMigrationsAsync()).Any())
+                    {
+                        var respaldo = await new RespaldoService(dbContext).CrearRespaldoAsync(
+                            Path.Combine(Path.GetDirectoryName(rutaBaseDatos)!, "Respaldos"));
+                        if (!respaldo.Correcta)
+                            throw new IOException("No se pudo crear el respaldo previo a la migración.");
+                    }
+                    await dbContext.Database.MigrateAsync();
+                    await mainViewModel.InicializarAsync();
+                    mainWindow.IsEnabled = true;
+                }
+                catch (Exception ex)
+                {
+                    mainWindow.Content = new TextBlock
+                    {
+                        Text = $"No se pudo iniciar la base de datos: {ex.Message}",
+                        TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                        Margin = new Thickness(24)
+                    };
+                    mainWindow.IsEnabled = true;
+                    return;
+                }
+
+#if !DEBUG
+                try
+                {
+                    var actualizacion = await UpdateService.BuscarAsync();
+                    if (actualizacion is not null && mainWindow.IsVisible &&
+                        await new ActualizacionWindow(actualizacion).ShowDialog<bool>(mainWindow))
+                        desktop.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    // Network failures must not prevent normal use of the application.
+                    Trace.TraceWarning("No se pudo consultar la actualización: {0}", ex.Message);
+                }
+#endif
+            };
             desktop.Exit += (_, _) => dbContext.Dispose();
             desktop.MainWindow = mainWindow;
         }
@@ -71,6 +136,39 @@ public partial class App : Application
 
     private static string ResolverRutaBaseDatos()
     {
+#if !DEBUG
+        var carpeta = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "VeterinariaInteligente");
+        Directory.CreateDirectory(carpeta);
+        var ruta = Path.Combine(carpeta, "veterinariaInteligente.db");
+        if (!File.Exists(ruta))
+        {
+            // Import an existing portable installation without modifying its database.
+            var anterior = Path.Combine(AppContext.BaseDirectory, "veterinariaInteligente.db");
+            if (File.Exists(anterior))
+            {
+                var temporal = ruta + ".tmp";
+                try
+                {
+                    using (var origen = new SqliteConnection(new SqliteConnectionStringBuilder
+                           { DataSource = anterior, Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString()))
+                    using (var destino = new SqliteConnection(new SqliteConnectionStringBuilder
+                           { DataSource = temporal, Pooling = false }.ToString()))
+                    {
+                        origen.Open();
+                        destino.Open();
+                        origen.BackupDatabase(destino);
+                    }
+                    File.Move(temporal, ruta);
+                }
+                finally
+                {
+                    File.Delete(temporal);
+                }
+            }
+        }
+        return ruta;
+#else
         var directorio = new DirectoryInfo(Directory.GetCurrentDirectory());
 
         while (directorio is not null)
@@ -91,5 +189,6 @@ public partial class App : Application
         }
 
         return Path.Combine(Directory.GetCurrentDirectory(), "veterinariaInteligente.db");
+#endif
     }
 }

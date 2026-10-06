@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="veterinariaInteligente.Views.ActualizacionWindow"
+        Title="Actualización de PawDesk" Width="480" SizeToContent="Height"
+        CanResize="False" WindowStartupLocation="CenterOwner"
+        Background="{StaticResource ContentBackgroundBrush}">
+    <StackPanel Margin="24" Spacing="16">
+        <TextBlock Text="Actualización disponible" Classes="subsection"/>
+        <TextBlock x:Name="Estado" TextWrapping="Wrap"/>
+        <ProgressBar x:Name="Progreso" IsIndeterminate="True" IsVisible="False"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button x:Name="Posponer" Classes="secondary" Click="PosponerClick">Más tarde</Button>
+            <Button x:Name="Actualizar" Classes="primary" Click="ActualizarClick">Actualizar</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

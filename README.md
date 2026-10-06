@@ -67,6 +67,39 @@ dotnet build
 dotnet run
 ```
 
+## Publicación y actualizaciones automáticas (Windows x64)
+
+El workflow `.github/workflows/deploy.yml` ejecuta las pruebas y publica una
+release con cada push a `main`. También se puede ejecutar manualmente desde
+GitHub Actions. La versión sigue el formato `1.0.N`, donde `N` es el número
+de ejecución del workflow.
+
+Para la primera instalación, descargar el ZIP `veterinariaInteligente-1.0.N-win-x64.zip`
+desde GitHub Releases, extraerlo completo en una carpeta con permisos de escritura
+y abrir `veterinariaInteligente.exe`. Incluye el runtime de .NET.
+
+En compilaciones Release para Windows, la aplicación consulta las releases
+públicas de `tadeolmd-ubu/veterinariaInteligente` al iniciar. Si hay una versión
+nueva, ofrece descargarla, reemplazar los archivos y reiniciar. Las compilaciones
+Debug no consultan actualizaciones. El repositorio debe permitir GitHub Actions
+y la creación de releases con `GITHUB_TOKEN`; un repositorio privado requiere
+otro mecanismo de autenticación para el cliente.
+
+En Release, SQLite se guarda en la carpeta de datos local del usuario:
+`%LOCALAPPDATA%\VeterinariaInteligente\veterinariaInteligente.db` en Windows.
+Si existe una base junto al ejecutable y aún no hay una en la nueva ubicación,
+se importa mediante un respaldo SQLite, conservando el archivo original.
+En Debug se conserva la búsqueda de la base dentro del proyecto.
+
+Al iniciar se aplican las migraciones pendientes. Si la base ya existe,
+se crea antes un respaldo en la subcarpeta `Respaldos`; si falla el respaldo,
+no se ejecuta la migración. Los paquetes de actualización no incluyen bases
+de datos y el instalador excluye los archivos SQLite al copiar.
+
+Si falla el reemplazo de archivos, el actualizador muestra un error y conserva
+los detalles en `error.log` dentro de la carpeta temporal `VeterinariaUpdate-*`.
+La instalación y el reinicio mediante PowerShell deben verificarse en Windows.
+
 ## Estructura del proyecto
 
 ```text

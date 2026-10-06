@@ -1,0 +1,46 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Set version
+        id: version
+        shell: pwsh
+        run: '"version=1.0.$env:GITHUB_RUN_NUMBER" >> $env:GITHUB_OUTPUT'
+      - name: Test
+        run: dotnet test veterinariaInteligente.sln -c Release
+      - name: Publish
+        shell: pwsh
+        run: |
+          dotnet publish veterinariaInteligente/veterinariaInteligente.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -p:Version=${{ steps.version.outputs.version }} -p:AssemblyVersion=${{ steps.version.outputs.version }}.0 -p:FileVersion=${{ steps.version.outputs.version }}.0 -o publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (!(Test-Path publish/veterinariaInteligente.exe)) { throw 'No se generó el ejecutable.' }
+      - name: Create ZIP
+        shell: pwsh
+        run: Compress-Archive -Path publish/* -DestinationPath veterinariaInteligente-${{ steps.version.outputs.version }}-win-x64.zip
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          target_commitish: ${{ github.sha }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Veterinaria Inteligente v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: veterinariaInteligente-${{ steps.version.outputs.version }}-win-x64.zip
