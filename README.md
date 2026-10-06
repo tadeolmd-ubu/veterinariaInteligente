@@ -72,18 +72,66 @@ dotnet run
 El workflow `.github/workflows/deploy.yml` ejecuta las pruebas y publica una
 release con cada push a `main`. También se puede ejecutar manualmente desde
 GitHub Actions. La versión sigue el formato `1.0.N`, donde `N` es el número
-de ejecución del workflow.
+de ejecución del workflow. Un merge a `main` también dispara la publicación.
+La nueva release se publica únicamente si las pruebas y la generación del
+paquete terminan correctamente.
 
-Para la primera instalación, descargar el ZIP `veterinariaInteligente-1.0.N-win-x64.zip`
-desde GitHub Releases, extraerlo completo en una carpeta con permisos de escritura
-y abrir `veterinariaInteligente.exe`. Incluye el runtime de .NET.
+### Primera instalación en Windows 11 (x64)
+
+1. Entrar en [GitHub Releases](https://github.com/tadeolmd-ubu/veterinariaInteligente/releases).
+2. En la última versión, abrir **Assets** y descargar
+   `veterinariaInteligente-1.0.N-win-x64.zip`, donde `N` corresponde a la versión
+   publicada. No descargar los archivos **Source code**.
+3. Si se descargó desde otra computadora, transferir el ZIP a Windows.
+4. Hacer clic derecho sobre el ZIP y seleccionar **Extraer todo**. Usar una
+   carpeta con permisos de escritura, por ejemplo `C:\Users\TU_USUARIO\Apps\PawDesk`.
+5. Abrir `veterinariaInteligente.exe` desde la carpeta extraída.
+
+Conservar todos los archivos de la carpeta: el ejecutable necesita las bibliotecas
+incluidas en el paquete. No hace falta instalar .NET, porque su runtime viene
+incluido. Ejecutar la aplicación desde la carpeta extraída, no desde el ZIP.
+
+Si todavía no aparece el paquete, revisar la ejecución en
+[Actions → Build and Release](https://github.com/tadeolmd-ubu/veterinariaInteligente/actions/workflows/deploy.yml).
+
+### Cuándo aparece el aviso de actualización
 
 En compilaciones Release para Windows, la aplicación consulta las releases
 públicas de `tadeolmd-ubu/veterinariaInteligente` al iniciar. Si hay una versión
-nueva, ofrece descargarla, reemplazar los archivos y reiniciar. Las compilaciones
-Debug no consultan actualizaciones. El repositorio debe permitir GitHub Actions
-y la creación de releases con `GITHUB_TOKEN`; un repositorio privado requiere
-otro mecanismo de autenticación para el cliente.
+nueva, muestra un diálogo con **Más tarde** y **Actualizar**. Al aceptar, descarga
+el paquete, cierra la aplicación, reemplaza los archivos y vuelve a abrirla.
+
+El flujo completo es:
+
+```text
+Push o merge a main
+  → pruebas y generación del ejecutable en GitHub Actions
+  → publicación de la nueva release
+  → el usuario abre una versión anterior de la aplicación
+  → aviso de actualización
+  → descarga, instalación y reinicio si acepta
+```
+
+El aviso no llega inmediatamente a una aplicación que ya está abierta: se
+consulta al iniciar. Si el usuario elige **Más tarde**, podrá recibir el aviso
+en el próximo inicio mientras siga instalada una versión anterior.
+
+Para recibir el aviso, el usuario debe tener una versión que incluya el
+actualizador, conexión a Internet y acceso a las releases públicas. Si no se
+puede consultar GitHub, la aplicación continúa funcionando. Las compilaciones
+Debug no consultan actualizaciones.
+
+### Configuración en GitHub
+
+El workflow usa el `GITHUB_TOKEN` automático de GitHub y declara el permiso
+`contents: write` para publicar releases; no requiere crear un token o secreto
+adicional. GitHub Actions debe estar habilitado y las políticas del repositorio
+deben permitir las acciones utilizadas y la creación de releases.
+
+El actualizador de escritorio accede sin autenticación a las releases. Un
+repositorio privado requiere otro mecanismo de acceso para el cliente.
+
+### Base de datos y respaldos
 
 En Release, SQLite se guarda en la carpeta de datos local del usuario:
 `%LOCALAPPDATA%\VeterinariaInteligente\veterinariaInteligente.db` en Windows.
@@ -99,6 +147,15 @@ de datos y el instalador excluye los archivos SQLite al copiar.
 Si falla el reemplazo de archivos, el actualizador muestra un error y conserva
 los detalles en `error.log` dentro de la carpeta temporal `VeterinariaUpdate-*`.
 La instalación y el reinicio mediante PowerShell deben verificarse en Windows.
+
+### Comprobar una actualización en Windows
+
+1. Instalar una primera release y guardar algunos datos de prueba.
+2. Publicar una segunda versión mediante un push o merge a `main`, o ejecutar
+   **Run workflow** desde GitHub Actions. Esperar a que la release esté disponible.
+3. Abrir la versión anterior y comprobar que aparece el aviso.
+4. Seleccionar **Actualizar** y verificar el cierre, reemplazo y reinicio.
+5. Comprobar que los datos guardados siguen disponibles.
 
 ## Estructura del proyecto
 
