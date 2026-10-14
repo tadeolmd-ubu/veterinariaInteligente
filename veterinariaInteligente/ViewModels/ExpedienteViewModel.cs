@@ -6,7 +6,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class ExpedienteViewModel : ObservableObject
+public partial class ExpedienteViewModel : PdfViewModel
 {
     private readonly ConsultaService? _consultaService;
 
@@ -24,11 +24,12 @@ public partial class ExpedienteViewModel : ObservableObject
     public ExpedienteViewModel(
         Mascota mascota,
         Duenio duenio,
-        ConsultaService? consultaService)
+        ConsultaService? consultaService, PdfService? pdfService = null)
     {
         MascotaActual = mascota;
         DuenioActual = duenio;
         _consultaService = consultaService;
+        if (pdfService is not null) ConfigurarPdf(pdfService);
     }
 
     public Mascota MascotaActual { get; }
@@ -44,6 +45,23 @@ public partial class ExpedienteViewModel : ObservableObject
     [ObservableProperty]
     private bool isBusy;
 
+    protected override void InformarPdf(string mensaje, bool correcta = false)
+        => MensajeOperacion = Notificar(mensaje, correcta);
+
+    [RelayCommand]
+    private async Task GenerarExpedientePdfAsync()
+    {
+        if (IsBusy) return;
+        IsBusy = true;
+        try
+        {
+            await GenerarPdfAsync(MascotaActual?.Id, "expediente",
+                (pdf, id) => pdf.GenerarExpedienteAsync(id));
+        }
+        catch (Exception ex) { MensajeOperacion = Notificar($"No se pudo generar el PDF: {ex.Message}"); }
+        finally { IsBusy = false; }
+    }
+
     [RelayCommand]
     public async Task CargarAsync()
     {
@@ -55,7 +73,7 @@ public partial class ExpedienteViewModel : ObservableObject
         try
         {
             var resultado = await _consultaService.ObtenerExpedienteAsync(MascotaActual.Id);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             ConsultasItems.Clear();
             SelectedConsulta = null;
 
@@ -71,7 +89,7 @@ public partial class ExpedienteViewModel : ObservableObject
         {
             ConsultasItems.Clear();
             SelectedConsulta = null;
-            MensajeOperacion = $"No se pudo cargar el expediente: {ex.Message}";
+            MensajeOperacion = Notificar($"No se pudo cargar el expediente: {ex.Message}");
         }
         finally
         {

@@ -6,7 +6,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class VacunasViewModel : ObservableObject
+public partial class VacunasViewModel : PdfViewModel
 {
     private readonly VacunaService? _vacunas;
     private readonly AplicacionVacunaService? _aplicaciones;
@@ -17,12 +17,13 @@ public partial class VacunasViewModel : ObservableObject
 
     public VacunasViewModel() { }
     public VacunasViewModel(VacunaService vacunas, AplicacionVacunaService aplicaciones,
-        MascotaService mascotas, ProfesionalService profesionales)
+        MascotaService mascotas, ProfesionalService profesionales, PdfService? pdfService = null)
     {
         _vacunas = vacunas;
         _aplicaciones = aplicaciones;
         _mascotas = mascotas;
         _profesionales = profesionales;
+        if (pdfService is not null) ConfigurarPdf(pdfService);
     }
 
     public ObservableCollection<Vacuna> VacunasItems { get; } = [];
@@ -31,9 +32,17 @@ public partial class VacunasViewModel : ObservableObject
     public ObservableCollection<Mascota> MascotasItems { get; } = [];
     public ObservableCollection<Profesional> ProfesionalesItems { get; } = [];
 
-    [ObservableProperty] private Vacuna? selectedVacuna;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AgregarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DesactivarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActivarVacunaCommand))]
+    private Vacuna? selectedVacuna;
     [ObservableProperty] private Vacuna? selectedVacunaAplicacion;
-    [ObservableProperty] private AplicacionVacuna? selectedAplicacion;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AgregarAplicacionCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarAplicacionCommand))]
+    private AplicacionVacuna? selectedAplicacion;
     [ObservableProperty] private Mascota? selectedMascota;
     [ObservableProperty] private Mascota? filtroMascota;
     [ObservableProperty] private Profesional? selectedProfesional;
@@ -46,7 +55,27 @@ public partial class VacunasViewModel : ObservableObject
     [ObservableProperty] private bool mostrandoInactivas;
     [ObservableProperty] private string busquedaVacunas = string.Empty;
     [ObservableProperty] private string mensajeOperacion = string.Empty;
-    [ObservableProperty] private bool isBusy;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AgregarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DesactivarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActivarVacunaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AgregarAplicacionCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarAplicacionCommand))]
+    private bool isBusy;
+
+    private bool PuedeCrearVacuna() => !IsBusy && SelectedVacuna is null;
+    private bool PuedeModificarVacuna() => !IsBusy && SelectedVacuna?.Activo == 1;
+    private bool PuedeActivarVacuna() => !IsBusy && SelectedVacuna?.Activo == 0;
+    private bool PuedeAgregarAplicacion() => !IsBusy && SelectedAplicacion is null;
+    private bool PuedeActualizarAplicacion() => !IsBusy && SelectedAplicacion is not null;
+
+    partial void OnSelectedMascotaChanged(Mascota? value) => LimpiarPdf();
+    protected override void InformarPdf(string mensaje, bool correcta = false)
+        => MensajeOperacion = Notificar(mensaje, correcta);
+    [RelayCommand]
+    private Task GenerarCartillaPdfAsync() => EjecutarAsync(() =>
+        GenerarPdfAsync(SelectedMascota?.Id, "cartilla", (pdf, id) => pdf.GenerarCartillaVacunacionAsync(id)));
 
     partial void OnSelectedVacunaChanged(Vacuna? value)
     {
@@ -70,27 +99,27 @@ public partial class VacunasViewModel : ObservableObject
     [RelayCommand]
     public Task CargarAsync() => EjecutarAsync(() => RecargarAsync());
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeCrearVacuna))]
     private Task AgregarVacunaAsync() => EjecutarAsync(async () =>
     {
-        if (_vacunas is null) return;
+        if (_vacunas is null || SelectedVacuna is not null) return;
         var resultado = await _vacunas.AgregarAsync(Nombre, Descripcion);
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
         if (!resultado.Correcta) return;
         MostrandoInactivas = false;
         BusquedaVacunas = string.Empty;
         await RecargarAsync(resultado.Valor?.Id);
     });
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeModificarVacuna))]
     private Task ActualizarVacunaAsync() => OperarVacunaAsync(
         v => _vacunas!.ActualizarAsync(v.Id, Nombre, Descripcion), activa: true);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeModificarVacuna))]
     private Task DesactivarVacunaAsync() => OperarVacunaAsync(
         v => _vacunas!.DesactivarAsync(v.Id), activa: true);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeActivarVacuna))]
     private Task ActivarVacunaAsync() => OperarVacunaAsync(
         v => _vacunas!.ActivarAsync(v.Id), activa: false);
 
@@ -102,28 +131,29 @@ public partial class VacunasViewModel : ObservableObject
         return EjecutarAsync(async () =>
         {
             var resultado = await operacion(vacuna);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             if (resultado.Correcta) await RecargarAsync(vacuna.Id);
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeAgregarAplicacion))]
     private Task AgregarAplicacionAsync() => GuardarAplicacionAsync(false);
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeActualizarAplicacion))]
     private Task ActualizarAplicacionAsync() => GuardarAplicacionAsync(true);
 
     private Task GuardarAplicacionAsync(bool editar) => EjecutarAsync(async () =>
     {
-        if (_aplicaciones is null || (editar && SelectedAplicacion is null)) return;
+        if (_aplicaciones is null || (editar && SelectedAplicacion is null) ||
+            (!editar && SelectedAplicacion is not null)) return;
         if (SelectedVacunaAplicacion is null || FechaAplicacion is null ||
             (!editar && SelectedMascota is null))
         {
-            MensajeOperacion = "Seleccioná una vacuna activa, una mascota y la fecha de aplicación.";
+            MensajeOperacion = Notificar("Seleccioná una vacuna activa, una mascota y la fecha de aplicación.");
             return;
         }
         if (editar && SelectedProfesional is null)
         {
-            MensajeOperacion = "El servicio requiere un profesional para editar la aplicación.";
+            MensajeOperacion = Notificar("El servicio requiere un profesional para editar la aplicación.");
             return;
         }
         var fecha = DateOnly.FromDateTime(FechaAplicacion.Value.Date);
@@ -133,14 +163,14 @@ public partial class VacunasViewModel : ObservableObject
             var id = SelectedAplicacion!.Id;
             var resultado = await _aplicaciones.ActualizarAsync(id, fecha, Lote, Observacion,
                 proxima, SelectedVacunaAplicacion.Id, SelectedProfesional!.Id);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             if (resultado.Correcta) await RecargarAsync(aplicacionId: id);
         }
         else
         {
             var resultado = await _aplicaciones.AgregarAsync(fecha, Lote, Observacion,
                 proxima, SelectedVacunaAplicacion.Id, SelectedMascota!.Id, SelectedProfesional?.Id);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             if (resultado.Correcta)
             {
                 FiltroMascota = null;
@@ -213,7 +243,7 @@ public partial class VacunasViewModel : ObservableObject
         if (IsBusy) return;
         IsBusy = true;
         try { await operacion(); }
-        catch (Exception ex) { MensajeOperacion = $"No se pudo completar la operación: {ex.Message}"; }
+        catch (Exception ex) { MensajeOperacion = Notificar($"No se pudo completar la operación: {ex.Message}"); }
         finally { IsBusy = false; }
     }
 

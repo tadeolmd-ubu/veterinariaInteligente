@@ -8,7 +8,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class ConsultasViewModel : ObservableObject
+public partial class ConsultasViewModel : PdfViewModel
 {
     private readonly ConsultaService? _consultaService;
     private readonly MascotaService? _mascotaService;
@@ -23,11 +23,12 @@ public partial class ConsultasViewModel : ObservableObject
     public ConsultasViewModel(
         ConsultaService consultaService,
         MascotaService mascotaService,
-        ProfesionalService profesionalService)
+        ProfesionalService profesionalService, PdfService? pdfService = null)
     {
         _consultaService = consultaService;
         _mascotaService = mascotaService;
         _profesionalService = profesionalService;
+        if (pdfService is not null) ConfigurarPdf(pdfService);
     }
 
     public ObservableCollection<Consulta> ConsultasItems { get; } = [];
@@ -102,8 +103,12 @@ public partial class ConsultasViewModel : ObservableObject
 
     partial void OnSelectedConsultaChanged(Consulta? value)
     {
+        LimpiarPdf();
         if (value is null)
+        {
+            LimpiarFormulario();
             return;
+        }
 
         Motivo = value.Motivo;
         Peso = value.Peso;
@@ -113,6 +118,13 @@ public partial class ConsultasViewModel : ObservableObject
         SelectedMascota = MascotasItems.FirstOrDefault(m => m.Id == value.IdMascota);
         SelectedProfesional = ProfesionalesItems.FirstOrDefault(p => p.Id == value.IdProfesional);
     }
+
+    protected override void InformarPdf(string mensaje, bool correcta = false)
+        => MensajeOperacion = Notificar(mensaje, correcta);
+
+    [RelayCommand]
+    private Task GenerarConsultaPdfAsync() => EjecutarSeguroAsync(() =>
+        GenerarPdfAsync(SelectedConsulta?.Id, "consulta", (pdf, id) => pdf.GenerarConsultaAsync(id)));
 
     partial void OnMostrandoArchivadasChanged(bool value) => FiltrarConsultas();
 
@@ -149,7 +161,7 @@ public partial class ConsultasViewModel : ObservableObject
 
         if (SelectedMascota is null || SelectedProfesional is null)
         {
-            MensajeOperacion = "Seleccioná una mascota y un profesional.";
+            MensajeOperacion = Notificar("Seleccioná una mascota y un profesional.");
             return;
         }
 
@@ -164,13 +176,14 @@ public partial class ConsultasViewModel : ObservableObject
                 SelectedMascota.Id,
                 SelectedProfesional.Id);
 
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (!resultado.Correcta || resultado.Valor is null)
                 return;
 
             LimpiarFormulario();
-            await RecargarAsync(resultado.Valor.Id);
+            await RecargarAsync();
+            LimpiarFormulario();
         });
     }
 
@@ -182,7 +195,7 @@ public partial class ConsultasViewModel : ObservableObject
 
         if (SelectedProfesional is null)
         {
-            MensajeOperacion = "Seleccioná un profesional.";
+            MensajeOperacion = Notificar("Seleccioná un profesional.");
             return;
         }
 
@@ -199,7 +212,7 @@ public partial class ConsultasViewModel : ObservableObject
                 Peso,
                 SelectedProfesional.Id);
 
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (resultado.Correcta)
                 await RecargarAsync(consultaId);
@@ -217,7 +230,7 @@ public partial class ConsultasViewModel : ObservableObject
         await EjecutarSeguroAsync(async () =>
         {
             var resultado = await _consultaService.ArchivarAsync(consultaId);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (resultado.Correcta)
             {
@@ -238,7 +251,7 @@ public partial class ConsultasViewModel : ObservableObject
         await EjecutarSeguroAsync(async () =>
         {
             var resultado = await _consultaService.RestaurarAsync(consultaId);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (resultado.Correcta)
             {
@@ -267,6 +280,7 @@ public partial class ConsultasViewModel : ObservableObject
     [RelayCommand]
     private void NuevaConsulta()
     {
+        if (IsBusy) return;
         SelectedConsulta = null;
         LimpiarFormulario();
         MensajeOperacion = string.Empty;
@@ -285,10 +299,9 @@ public partial class ConsultasViewModel : ObservableObject
         var profesionales = await _profesionalService.ObtenerTodosAsync();
         var consultasActivas = await _consultaService.ObtenerTodosAsync();
         var consultasArchivadas = await _consultaService.ObtenerArchivadasAsync();
-        foreach (var consulta in consultasActivas)
+        foreach (var consulta in consultasActivas.Concat(consultasArchivadas))
         {
-            var detalle = await _consultaService.ObtenerPorIdAsync(consulta.Id);
-            if (detalle is not null) consulta.Versiones = detalle.Versiones;
+            consulta.Versiones = await _consultaService.ObtenerVersionesAsync(consulta.Id);
         }
 
         ReemplazarItems(MascotasItems, mascotas.Where(m => m.IdEstado == 1));
@@ -334,7 +347,7 @@ public partial class ConsultasViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MensajeOperacion = $"No se pudo completar la operación: {ex.Message}";
+            MensajeOperacion = Notificar($"No se pudo completar la operación: {ex.Message}");
         }
         finally
         {
@@ -349,6 +362,7 @@ public partial class ConsultasViewModel : ObservableObject
         SelectedProfesional = null;
         Motivo = string.Empty;
         Peso = null;
+        PesoTexto = string.Empty;
         Observacion = string.Empty;
         Diagnostico = string.Empty;
         Tratamiento = string.Empty;

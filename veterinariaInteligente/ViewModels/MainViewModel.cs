@@ -5,7 +5,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : OperacionViewModel
 {
     private readonly PropietariosViewModel _propietariosViewModel;
     private readonly CitasViewModel _citasViewModel;
@@ -28,6 +28,20 @@ public partial class MainViewModel : ObservableObject
         _consultaService = consultaService;
         _configuracionViewModel = configuracionViewModel;
         _inicioViewModel = inicioViewModel;
+        propietariosViewModel.MensajeSolicitado += SolicitarMensaje;
+        citasViewModel.MensajeSolicitado += SolicitarMensaje;
+        pendientesViewModel.MensajeSolicitado += SolicitarMensaje;
+        vacunasViewModel.MensajeSolicitado += SolicitarMensaje;
+        consultasViewModel.MensajeSolicitado += SolicitarMensaje;
+        configuracionViewModel.MensajeSolicitado += SolicitarMensaje;
+        inicioViewModel.MensajeSolicitado += SolicitarMensaje;
+        // Reutilizar la instancia ya provista por la composición actual de App.
+        if (configuracionViewModel.ServicioPdf is { } pdf)
+        {
+            propietariosViewModel.ConfigurarPdf(pdf);
+            consultasViewModel.ConfigurarPdf(pdf);
+            vacunasViewModel.ConfigurarPdf(pdf);
+        }
         _propietariosViewModel.ExpedienteSolicitado += MostrarExpediente;
         vistaActual = _propietariosViewModel;
         tituloVistaActual = "Propietarios y mascotas";
@@ -106,7 +120,9 @@ public partial class MainViewModel : ObservableObject
 
     private async void MostrarExpediente(Mascota mascota, Duenio duenio)
     {
-        var expedienteViewModel = new ExpedienteViewModel(mascota, duenio, _consultaService);
+        var expedienteViewModel = new ExpedienteViewModel(mascota, duenio, _consultaService,
+            _configuracionViewModel.ServicioPdf);
+        expedienteViewModel.MensajeSolicitado += SolicitarMensaje;
         VistaActual = expedienteViewModel;
         TituloVistaActual = $"Expediente de {mascota.Nombre}";
         await expedienteViewModel.CargarAsync();
