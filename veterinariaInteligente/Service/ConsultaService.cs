@@ -45,7 +45,20 @@ public class ConsultaService
             .Include(c => c.Mascota)
             .Include(c => c.Profesional)
             .Include(c => c.Versiones)
+                .ThenInclude(v => v.Profesional)
             .FirstOrDefaultAsync(c => c.Id == id &&  c.Estado != EstadoConsulta.Archivada);
+    }
+
+    // Historial (versiones) de una consulta, sin filtrar por estado para que
+    // el detalle no quede vacío cuando la consulta está archivada.
+    public async Task<List<ConsultaVersion>> ObtenerVersionesAsync(int idConsulta)
+    {
+        return await _db.ConsultaVersiones
+            .AsNoTracking()
+            .Include(v => v.Profesional)
+            .Where(v => v.IdConsulta == idConsulta)
+            .OrderByDescending(v => v.Fecha)
+            .ToListAsync();
     }
 
     public async Task<Consulta?> ObtenerNoArchivadasAsync(int id)
@@ -209,6 +222,7 @@ public class ConsultaService
             .AsNoTracking()
             .Include(c => c.Profesional)
             .Include(c => c.Versiones)
+                .ThenInclude(v => v.Profesional)
             .Where(c =>
                 c.IdMascota == idMascota &&
                 c.Estado != EstadoConsulta.Archivada)
