@@ -175,6 +175,37 @@ public class CitaService
             $"Estado cambiado a {estado}.");
     }
 
+    // Devuelve una cita cancelada a un estado activo. A diferencia de
+    // CambiarEstadoAsync, permite partir de Cancelada.
+    public async Task<Resultado> ReactivarAsync(
+        int id,
+        EstadoCita nuevoEstado)
+    {
+        if (nuevoEstado == EstadoCita.Cancelada)
+            return new Resultado(false, "Para cancelar una cita usá CancelarAsync.");
+
+        var cita = await _db.Citas
+            .FirstOrDefaultAsync(c =>
+                c.Id == id &&
+                c.Estado == EstadoCita.Cancelada);
+
+        if (cita is null)
+            return new Resultado(false, "La cita no existe o no está cancelada.");
+
+        // Los destinos agendados exigen fecha futura (misma regla que AgregarAsync).
+        if (nuevoEstado is EstadoCita.Pendiente or EstadoCita.Confirmada &&
+            cita.FechaPrevista <= DateTime.Now)
+        {
+            return new Resultado(false, "La fecha de la cita debe ser futura.");
+        }
+
+        cita.Estado = nuevoEstado;
+
+        await _db.SaveChangesAsync();
+
+        return new Resultado(true, $"Cita reactivada como {nuevoEstado}.");
+    }
+
     public async Task<Resultado> CancelarAsync(int id)
     {
         var cita = await _db.Citas
