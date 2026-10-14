@@ -6,7 +6,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class PropietariosViewModel : ObservableObject
+public partial class PropietariosViewModel : PdfViewModel
 {
     private const int EstadoMascotaActivaId = 1;
 
@@ -20,6 +20,7 @@ public partial class PropietariosViewModel : ObservableObject
 
     partial void OnMostrandoArchivadosChanged(bool value) => FiltrarPropietarios();
     private readonly List<Mascota> _mascotasCargadas = [];
+    private readonly List<Mascota> _mascotasArchivadas = [];
 
     public PropietariosViewModel()
     {
@@ -27,22 +28,55 @@ public partial class PropietariosViewModel : ObservableObject
 
     public PropietariosViewModel(
         DuenioService duenioService,
-        MascotaService mascotaService)
+        MascotaService mascotaService, PdfService? pdfService = null)
     {
         _duenioService = duenioService;
         _mascotaService = mascotaService;
+        if (pdfService is not null) ConfigurarPdf(pdfService);
     }
 
     public ObservableCollection<Duenio> PropietariosItems { get; } = [];
     public ObservableCollection<Mascota> MascotasItems { get; } = [];
+    public ObservableCollection<Duenio> PropietariosActivos { get; } = [];
+    public ObservableCollection<Duenio> PropietariosArchivados { get; } = [];
+    public ObservableCollection<Mascota> MascotasActivas { get; } = [];
+    public ObservableCollection<Mascota> MascotasArchivadas { get; } = [];
+    [ObservableProperty] private string editarNombre = string.Empty;
+    [ObservableProperty] private string editarTelefono = string.Empty;
+    [ObservableProperty] private string? editarCorreo;
+    [ObservableProperty] private string? editarDireccion;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NombreDuenioMascota))]
+    private Duenio? duenioSeleccionadoParaMascota;
+    public string NombreDuenioMascota => DuenioSeleccionadoParaMascota?.Nombre ?? string.Empty;
+    /// <summary>Front registra un único selector modal; null significa cancelar.</summary>
+    public event Func<Task<Duenio?>>? SeleccionPropietarioSolicitada;
+
+    [RelayCommand]
+    private Task SeleccionarDuenioMascotaAsync() => EjecutarSeguroAsync(async () =>
+    {
+        if (SeleccionPropietarioSolicitada is not { } seleccionar) return;
+        var duenio = await seleccionar();
+        if (duenio is not null && duenio.FechaArchivado is null)
+            DuenioSeleccionadoParaMascota = duenio;
+    });
     public IReadOnlyList<string> SexosMascota { get; } = ["Macho", "Hembra"];
 
     public event Action<Mascota, Duenio>? ExpedienteSolicitado;
+
+    partial void OnSelectedMascotaChanged(Mascota? value) => LimpiarPdf();
+    protected override void InformarPdf(string mensaje, bool correcta = false)
+        => MensajeOperacion = Notificar(mensaje, correcta);
+    [RelayCommand]
+    private Task GenerarExpedientePdfAsync() => EjecutarSeguroAsync(() =>
+        GenerarPdfAsync(SelectedMascota?.Id, "expediente", (pdf, id) => pdf.GenerarExpedienteAsync(id)));
 
     [ObservableProperty]
     private Duenio? selectedPropietario;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RestaurarMascotaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArchivarMascotaCommand))]
     private Mascota? selectedMascota;
 
     [ObservableProperty]
@@ -85,7 +119,13 @@ public partial class PropietariosViewModel : ObservableObject
 
     partial void OnSelectedPropietarioChanged(Duenio? value)
     {
+        EditarNombre = value?.Nombre ?? string.Empty;
+        EditarTelefono = value?.Telefono ?? string.Empty;
+        EditarCorreo = value?.Correo;
+        EditarDireccion = value?.Direccion;
         MascotasItems.Clear();
+        MascotasActivas.Clear();
+        MascotasArchivadas.Clear();
         SelectedMascota = null;
 
         if (value is null)
@@ -93,10 +133,14 @@ public partial class PropietariosViewModel : ObservableObject
 
         foreach (var mascota in _mascotasCargadas.Where(m => m.IdDuenio == value.Id))
         {
+            MascotasActivas.Add(mascota);
             MascotasItems.Add(mascota);
         }
-
-        SelectedMascota = MascotasItems.FirstOrDefault();
+        foreach (var mascota in _mascotasArchivadas.Where(m => m.IdDuenio == value.Id))
+        {
+            MascotasArchivadas.Add(mascota);
+            MascotasItems.Add(mascota);
+        }
     }
 
     partial void OnBusquedaPropietariosChanged(string value)
@@ -118,13 +162,14 @@ public partial class PropietariosViewModel : ObservableObject
             NuevoPropietarioCorreo,
             NuevoPropietarioDireccion);
 
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
         if (!resultado.Correcta || resultado.Valor is null)
             return;
 
         LimpiarFormularioPropietario();
-        await RecargarAsync(resultado.Valor.Id);
+        SelectedPropietario = null;
+        await RecargarAsync();
     }
 
     [RelayCommand]
@@ -138,12 +183,12 @@ public partial class PropietariosViewModel : ObservableObject
         var propietario = SelectedPropietario;
         var resultado = await _duenioService.ActualizarAsync(
             propietario.Id,
-            propietario.Nombre,
-            propietario.Telefono,
-            propietario.Correo,
-            propietario.Direccion);
+            EditarNombre,
+            EditarTelefono,
+            EditarCorreo,
+            EditarDireccion);
 
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
         if (resultado.Correcta)
             await RecargarAsync(propietario.Id);
@@ -158,7 +203,7 @@ public partial class PropietariosViewModel : ObservableObject
             return;
 
         var resultado = await _duenioService.ArchivarAsync(SelectedPropietario.Id);
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
         if (resultado.Correcta)
             await RecargarAsync();
@@ -172,11 +217,15 @@ public partial class PropietariosViewModel : ObservableObject
         if (_duenioService is null || SelectedPropietario is null)
             return;
 
-        var resultado = await _duenioService.RestaurarAsync(SelectedPropietario.Id);
-        MensajeOperacion = resultado.Mensaje;
+        var id = SelectedPropietario.Id;
+        var resultado = await _duenioService.RestaurarAsync(id);
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
         if (resultado.Correcta)
-            await RecargarAsync(SelectedPropietario.Id);
+        {
+            BusquedaPropietarios = string.Empty;
+            await RecargarAsync(id);
+        }
     }
 
     [RelayCommand]
@@ -184,8 +233,17 @@ public partial class PropietariosViewModel : ObservableObject
 
     private async Task AgregarMascotaInternoAsync()
     {
-        if (_mascotaService is null || SelectedPropietario is null)
+        if (_mascotaService is null) return;
+        if (DuenioSeleccionadoParaMascota is not { FechaArchivado: null } duenio)
+        {
+            MensajeOperacion = Notificar("Seleccioná un dueño activo para la mascota.");
             return;
+        }
+        if (NuevaMascotaFechaNacimiento?.Date == DateTime.MinValue.Date)
+        {
+            MensajeOperacion = Notificar("Seleccioná una fecha de nacimiento válida o dejala vacía.");
+            return;
+        }
 
         DateOnly? fechaNacimiento = NuevaMascotaFechaNacimiento is null
             ? null
@@ -199,19 +257,35 @@ public partial class PropietariosViewModel : ObservableObject
             NuevaMascotaColor,
             NuevaMascotaAlergia,
             EstadoMascotaActivaId,
-            SelectedPropietario.Id);
+            duenio.Id);
 
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
         if (!resultado.Correcta)
             return;
 
-        var propietarioId = SelectedPropietario.Id;
+        var propietarioId = duenio.Id;
         LimpiarFormularioMascota();
         await RecargarAsync(propietarioId);
     }
 
-    [RelayCommand]
+    private bool PuedeArchivarMascota() => !IsBusy && SelectedMascota is { FechaArchivado: null };
+    private bool PuedeRestaurarMascota() => !IsBusy && SelectedMascota?.FechaArchivado is not null;
+
+    [RelayCommand(CanExecute = nameof(PuedeRestaurarMascota))]
+    private Task RestaurarMascotaAsync() => EjecutarSeguroAsync(async () =>
+    {
+        if (_mascotaService is null || SelectedMascota?.FechaArchivado is null) return;
+        var id = SelectedMascota.Id;
+        var duenioId = SelectedMascota.IdDuenio;
+        var resultado = await _mascotaService.RestaurarAsync(id);
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
+        if (!resultado.Correcta) return;
+        await RecargarAsync(duenioId);
+        SelectedMascota = MascotasItems.FirstOrDefault(m => m.Id == id);
+    });
+
+    [RelayCommand(CanExecute = nameof(PuedeArchivarMascota))]
     private Task ArchivarMascotaAsync() => EjecutarSeguroAsync(ArchivarMascotaInternoAsync);
 
     private async Task ArchivarMascotaInternoAsync()
@@ -221,7 +295,7 @@ public partial class PropietariosViewModel : ObservableObject
 
         var propietarioId = SelectedPropietario?.Id;
         var resultado = await _mascotaService.ArchivarAsync(SelectedMascota.Id);
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
         if (resultado.Correcta)
             await RecargarAsync(propietarioId);
@@ -243,6 +317,9 @@ public partial class PropietariosViewModel : ObservableObject
 
         var propietarios = await _duenioService.ObtenerTodosAsync();
         var mascotas = await _mascotaService.ObtenerTodosAsync();
+        var mascotasArchivadas = await _mascotaService.ObtenerArchivadasDeDueniosActivosAsync();
+        _mascotasArchivadas.Clear();
+        _mascotasArchivadas.AddRange(mascotasArchivadas);
         var archivados = await _duenioService.ObtenerArchivadosAsync();
         _propietariosArchivados.Clear();
         _propietariosArchivados.AddRange(archivados);
@@ -267,7 +344,7 @@ public partial class PropietariosViewModel : ObservableObject
     {
         var idSeleccionado = propietarioIdSeleccionado ?? SelectedPropietario?.Id;
         var termino = BusquedaPropietarios?.Trim() ?? string.Empty;
-        var origen = MostrandoArchivados ? _propietariosArchivados : _propietariosCargados;
+        var origen = _propietariosCargados.Concat(_propietariosArchivados).ToList();
 
         var propietariosFiltrados = string.IsNullOrEmpty(termino)
             ? origen
@@ -278,25 +355,37 @@ public partial class PropietariosViewModel : ObservableObject
                 .ToList();
 
         PropietariosItems.Clear();
+        PropietariosActivos.Clear();
+        PropietariosArchivados.Clear();
 
         foreach (var propietario in propietariosFiltrados)
         {
-            PropietariosItems.Add(propietario);
+            if (propietario.FechaArchivado is null)
+            {
+                PropietariosActivos.Add(propietario);
+                PropietariosItems.Add(propietario);
+            }
+            else
+            {
+                PropietariosArchivados.Add(propietario);
+                if (MostrandoArchivados) PropietariosItems.Add(propietario);
+            }
         }
 
-        SelectedPropietario = PropietariosItems
-            .FirstOrDefault(p => p.Id == idSeleccionado)
-            ?? PropietariosItems.FirstOrDefault();
+        SelectedPropietario = propietariosFiltrados.FirstOrDefault(p => p.Id == idSeleccionado);
     }
 
-    private bool _operacionEnCurso;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RestaurarMascotaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArchivarMascotaCommand))]
+    private bool isBusy;
     private async Task EjecutarSeguroAsync(Func<Task> operacion)
     {
-        if (_operacionEnCurso) return;
-        _operacionEnCurso = true;
+        if (IsBusy) return;
+        IsBusy = true;
         try { await operacion(); }
-        catch (Exception ex) { MensajeOperacion = $"No se pudo completar la operación: {ex.Message}"; }
-        finally { _operacionEnCurso = false; }
+        catch (Exception ex) { MensajeOperacion = Notificar($"No se pudo completar la operación: {ex.Message}"); }
+        finally { IsBusy = false; }
     }
 
     private void LimpiarFormularioPropietario()
@@ -315,5 +404,6 @@ public partial class PropietariosViewModel : ObservableObject
         NuevaMascotaColor = string.Empty;
         NuevaMascotaAlergia = null;
         NuevaMascotaFechaNacimiento = null;
+        DuenioSeleccionadoParaMascota = null;
     }
 }

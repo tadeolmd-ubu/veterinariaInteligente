@@ -7,7 +7,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class CitasViewModel : ObservableObject
+public partial class CitasViewModel : OperacionViewModel
 {
     private readonly CitaService? _citaService;
     private readonly MascotaService? _mascotaService;
@@ -42,6 +42,9 @@ public partial class CitasViewModel : ObservableObject
     ];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AgregarCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReactivarCitaCommand))]
+    [NotifyPropertyChangedFor(nameof(PuedeReactivar))]
     [NotifyCanExecuteChangedFor(nameof(ActualizarCitaCommand))]
     [NotifyCanExecuteChangedFor(nameof(CambiarEstadoCitaCommand))]
     [NotifyCanExecuteChangedFor(nameof(CancelarCitaCommand))]
@@ -56,6 +59,7 @@ public partial class CitasViewModel : ObservableObject
     private Profesional? selectedProfesional;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ReactivarCitaCommand))]
     private EstadoCita selectedEstado = EstadoCita.Pendiente;
 
     [ObservableProperty]
@@ -71,6 +75,9 @@ public partial class CitasViewModel : ObservableObject
     private string busquedaCitas = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AgregarCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReactivarCitaCommand))]
+    [NotifyPropertyChangedFor(nameof(PuedeReactivar))]
     [NotifyCanExecuteChangedFor(nameof(ActualizarCitaCommand))]
     [NotifyCanExecuteChangedFor(nameof(CambiarEstadoCitaCommand))]
     [NotifyCanExecuteChangedFor(nameof(CancelarCitaCommand))]
@@ -91,6 +98,9 @@ public partial class CitasViewModel : ObservableObject
     private string mensajeOperacion = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AgregarCitaCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReactivarCitaCommand))]
+    [NotifyPropertyChangedFor(nameof(PuedeReactivar))]
     [NotifyCanExecuteChangedFor(nameof(ActualizarCitaCommand))]
     [NotifyCanExecuteChangedFor(nameof(CambiarEstadoCitaCommand))]
     [NotifyCanExecuteChangedFor(nameof(CancelarCitaCommand))]
@@ -100,6 +110,27 @@ public partial class CitasViewModel : ObservableObject
 
     public bool PuedeModificar => !IsBusy && SelectedCita is { Estado: not EstadoCita.Cancelada } && !MostrandoCanceladas;
     public bool PuedeCancelar => !IsBusy && SelectedCita is { Estado: not EstadoCita.Cancelada } && !MostrandoCanceladas;
+    private bool PuedeCrear() => !IsBusy && SelectedCita is null && !MostrandoCanceladas;
+    public bool PuedeReactivar => !IsBusy && SelectedCita is { Estado: EstadoCita.Cancelada };
+    private bool PuedeReactivarAlEstado() => PuedeReactivar && SelectedEstado != EstadoCita.Cancelada;
+
+    [RelayCommand(CanExecute = nameof(PuedeReactivarAlEstado))]
+    private Task ReactivarCitaAsync()
+    {
+        if (!PuedeReactivarAlEstado() || _citaService is null) return Task.CompletedTask;
+        var id = SelectedCita!.Id;
+        var estado = SelectedEstado;
+        return EjecutarSeguroAsync(async () =>
+        {
+            var resultado = await _citaService.ReactivarAsync(id, estado);
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
+            if (!resultado.Correcta) return;
+            MostrandoCanceladas = false;
+            MostrandoAgenda = false;
+            BusquedaCitas = string.Empty;
+            await RecargarAsync(id);
+        });
+    }
 
     [RelayCommand]
     public Task CargarAsync() => EjecutarSeguroAsync(() => RecargarAsync());
@@ -107,7 +138,10 @@ public partial class CitasViewModel : ObservableObject
     partial void OnSelectedCitaChanged(Cita? value)
     {
         if (value is null)
+        {
+            LimpiarFormulario();
             return;
+        }
 
         FechaPrevista = new DateTimeOffset(value.FechaPrevista);
         Motivo = value.Motivo;
@@ -125,10 +159,10 @@ public partial class CitasViewModel : ObservableObject
         FiltrarCitas();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(PuedeCrear))]
     private async Task AgregarCitaAsync()
     {
-        if (_citaService is null)
+        if (_citaService is null || !PuedeCrear())
             return;
 
         if (!TryObtenerDatosFormulario(out var fecha, out var mascotaId))
@@ -143,7 +177,7 @@ public partial class CitasViewModel : ObservableObject
                 mascotaId,
                 SelectedProfesional?.Id);
 
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (!resultado.Correcta || resultado.Valor is null)
                 return;
@@ -151,7 +185,8 @@ public partial class CitasViewModel : ObservableObject
             MostrandoCanceladas = false;
             MostrandoAgenda = false;
             LimpiarFormulario();
-            await RecargarAsync(resultado.Valor.Id);
+            await RecargarAsync();
+            LimpiarFormulario();
         });
     }
 
@@ -176,7 +211,7 @@ public partial class CitasViewModel : ObservableObject
                 mascotaId,
                 SelectedProfesional?.Id);
 
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (resultado.Correcta)
                 await RecargarAsync(citaId);
@@ -194,7 +229,7 @@ public partial class CitasViewModel : ObservableObject
         await EjecutarSeguroAsync(async () =>
         {
             var resultado = await _citaService.CambiarEstadoAsync(citaId, SelectedEstado);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (resultado.Correcta)
                 await RecargarAsync(citaId);
@@ -212,7 +247,7 @@ public partial class CitasViewModel : ObservableObject
         await EjecutarSeguroAsync(async () =>
         {
             var resultado = await _citaService.CancelarAsync(citaId);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
 
             if (!resultado.Correcta)
                 return;
@@ -246,20 +281,7 @@ public partial class CitasViewModel : ObservableObject
         if (_citaService is null)
             return;
 
-        if (AgendaDesde is null || AgendaHasta is null)
-        {
-            MensajeOperacion = "Seleccioná el inicio y el fin de la agenda.";
-            return;
-        }
-
-        var desde = AgendaDesde.Value.LocalDateTime.Date;
-        var hasta = FinDelDia(AgendaHasta.Value.Date);
-
-        if (desde > hasta)
-        {
-            MensajeOperacion = "El inicio de la agenda no puede ser posterior al fin.";
-            return;
-        }
+        if (!TryObtenerRangoAgenda(out var desde, out var hasta)) return;
 
         await EjecutarSeguroAsync(async () =>
         {
@@ -273,13 +295,15 @@ public partial class CitasViewModel : ObservableObject
             MostrandoAgenda = true;
             SelectedCita = null;
             FiltrarCitas();
-            MensajeOperacion = $"Agenda cargada: {citas.Count} cita(s).";
+            MensajeOperacion = Notificar($"Agenda cargada: {citas.Count} cita(s).", true);
         });
     }
 
     [RelayCommand]
     private void NuevaCita()
     {
+        if (IsBusy) return;
+        MostrandoCanceladas = false;
         LimpiarFormulario();
         MensajeOperacion = string.Empty;
     }
@@ -317,11 +341,12 @@ public partial class CitasViewModel : ObservableObject
 
     private async Task RecargarAgendaAsync()
     {
-        if (_citaService is null || AgendaDesde is null || AgendaHasta is null)
+        if (_citaService is null) return;
+        if (!TryObtenerRangoAgenda(out var desde, out var hasta))
+        {
+            _citasAgenda.Clear();
             return;
-
-        var desde = AgendaDesde.Value.LocalDateTime.Date;
-        var hasta = FinDelDia(AgendaHasta.Value.Date);
+        }
         var citas = await _citaService.ObtenerAgendaAsync(desde, hasta);
 
         _citasAgenda.Clear();
@@ -351,6 +376,22 @@ public partial class CitasViewModel : ObservableObject
         SelectedCita = CitasItems.FirstOrDefault(c => c.Id == idSeleccionado);
     }
 
+    private bool TryObtenerRangoAgenda(out DateTime desde, out DateTime hasta)
+    {
+        desde = hasta = default;
+        if (AgendaDesde is null || AgendaHasta is null)
+        {
+            MensajeOperacion = Notificar("Seleccioná el inicio y el fin de la agenda.");
+            return false;
+        }
+        // DatePicker representa días de calendario, no instantes convertidos a UTC/local.
+        desde = AgendaDesde.Value.Date;
+        hasta = FinDelDia(AgendaHasta.Value.Date);
+        if (desde <= hasta) return true;
+        MensajeOperacion = Notificar("El inicio de la agenda no puede ser posterior al fin.");
+        return false;
+    }
+
     private bool TryObtenerDatosFormulario(out DateTime fecha, out int mascotaId)
     {
         fecha = default;
@@ -358,13 +399,13 @@ public partial class CitasViewModel : ObservableObject
 
         if (FechaPrevista is null)
         {
-            MensajeOperacion = "Seleccioná la fecha y hora de la cita.";
+            MensajeOperacion = Notificar("Seleccioná la fecha y hora de la cita.");
             return false;
         }
 
         if (SelectedMascota is null)
         {
-            MensajeOperacion = "Seleccioná una mascota.";
+            MensajeOperacion = Notificar("Seleccioná una mascota.");
             return false;
         }
 
@@ -386,7 +427,7 @@ public partial class CitasViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MensajeOperacion = $"No se pudo completar la operación: {ex.Message}";
+            MensajeOperacion = Notificar($"No se pudo completar la operación: {ex.Message}");
         }
         finally
         {

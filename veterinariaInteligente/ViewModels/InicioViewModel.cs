@@ -4,7 +4,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class InicioViewModel : ObservableObject
+public partial class InicioViewModel : OperacionViewModel
 {
     private readonly DuenioService? _duenios;
     private readonly MascotaService? _mascotas;
@@ -51,7 +51,7 @@ public partial class InicioViewModel : ObservableObject
         catch (Exception ex)
         {
             TotalPropietarios = TotalMascotas = CitasHoy = SeguimientosVencidos = 0;
-            MensajeOperacion = $"No se pudo cargar el resumen: {ex.Message}";
+            MensajeOperacion = Notificar($"No se pudo cargar el resumen: {ex.Message}");
         }
         finally { IsBusy = false; }
     }
