@@ -291,6 +291,11 @@ Recomendación: el **ViewModel** expone primero el contrato (propiedades/comando
 
 # BACKEND — Hallazgos y qué hacer
 
+> **Estado (actualizado 2026-10-13):** los 4 hallazgos de backend están
+> implementados, con pruebas, y mergeados a `dev`. No hubo cambios de modelo ni
+> migraciones nuevas. Los ViewModels ya pueden consumir los contratos indicados
+> en cada hallazgo.
+
 ## #6 Archivar / desarchivar mascotas — Dueños
 **Hallazgo:** `MascotaService` ya tiene `ObtenerArchivadosAsync` y `RestaurarAsync` (`MascotaService.cs:28-35, 140-152`), pero no expone una consulta por dueño que incluya archivadas ni trae la navegación `Duenio`. `ObtenerPorIdAsync` filtra `FechaArchivado == null` (`MascotaService.cs:37-42`).
 
@@ -299,11 +304,21 @@ Recomendación: el **ViewModel** expone primero el contrato (propiedades/comando
 - Verificar que `RestaurarAsync` funcione aunque el dueño siga archivado.
 - Si aplica, agregar un método de lectura sin el filtro de `FechaArchivado`.
 
+**Estado:** ✅ Implementado (PR #26). `MascotaService.ObtenerArchivadasDeDueniosActivosAsync()`
+devuelve las mascotas archivadas cuyo dueño está activo, con la navegación `Duenio`
+cargada; las de un dueño archivado quedan ocultas hasta restaurar al dueño.
+`RestaurarAsync` ya funcionaba con el dueño archivado (cubierto por test).
+
 ## #8 Historial de consultas archivadas — Consultas
 **Hallazgo:** las versiones se persisten en `ConsultaService.RegistrarVersionSiCambio` (`ConsultaService.cs:224-243`), pero `ObtenerPorIdAsync` excluye archivadas (`ConsultaService.cs:41-49`).
 
 **Qué hacer:**
 - Exponer `ObtenerVersionesAsync(int idConsulta)` o permitir obtener el detalle sin filtrar por estado, para que el historial no quede vacío en archivadas.
+
+**Estado:** ✅ Implementado (PR #27). `ConsultaService.ObtenerVersionesAsync(int idConsulta)`
+devuelve el historial sin filtrar por estado. Además se agregó
+`.ThenInclude(v => v.Profesional)` en `ObtenerPorIdAsync` y `ObtenerExpedienteAsync`
+para que el nombre del profesional llegue a la vista también en consultas activas.
 
 ## #11 Cambiar estado de una cita cancelada — Cita
 **Hallazgo:** `CitaService.CambiarEstadoAsync` rechaza citas canceladas (`CitaService.cs:155-176`).
@@ -312,6 +327,11 @@ Recomendación: el **ViewModel** expone primero el contrato (propiedades/comando
 - Agregar una operación explícita, p. ej. `ReactivarAsync(int id, EstadoCita nuevoEstado)`, que permita partir de `Cancelada`.
 - Definir la regla de negocio (¿desde Cancelada se puede volver a `Pendiente`, `Confirmada`, `Atendida`?) y validar fecha si corresponde.
 - Mantener `CambiarEstadoAsync` para no canceladas o unificar con validación clara.
+
+**Estado:** ✅ Implementado (PR #28). `CitaService.ReactivarAsync(int id, EstadoCita nuevoEstado)`
+parte solo de una cita `Cancelada`, acepta cualquier destino menos `Cancelada` y exige
+fecha futura solo cuando el destino es `Pendiente`/`Confirmada`. `CambiarEstadoAsync`
+se mantiene igual.
 
 ## #18 Configuración de la veterinaria — Configuración
 **Hallazgo:** `ConfiguracionCliente` existe en el modelo y en `AppDbContext` (`AppDbContext.cs:17, 226-240`), pero no hay servicio que lo lea/guarde.
@@ -323,6 +343,13 @@ Recomendación: el **ViewModel** expone primero el contrato (propiedades/comando
   - Validaciones equivalentes a `DuenioService` (nombre/teléfono obligatorios, formato de teléfono, longitudes según `AppDbContext`).
 - Decidir el uso de `IdProfesionalDefault` y dejar el contrato claro para el ViewModel.
 - Crear migración/semilla solo si hace falta un registro por defecto.
+
+**Estado:** ✅ Implementado (PR #29). Nuevo `Service/ConfiguracionClienteService.cs`:
+`ObtenerAsync()` devuelve el registro único (o `null`) con `ProfesionalDefault` cargado,
+y `GuardarAsync(nombre, telefono, direccion, idProfesionalDefault?)` crea el registro la
+primera vez y lo actualiza después, validando que el profesional default sea activo si
+viene. Sin migración ni semilla: el registro se crea en el primer guardado. Se acordó
+mantener `IdProfesionalDefault` como parámetro opcional para el ViewModel.
 
 ## Transversales (sin cambios)
 - **#19:** `RespaldoService.CrearRespaldoAsync` ya recibe la carpeta (`RespaldoService.cs:13-14`).
