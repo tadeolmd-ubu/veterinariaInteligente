@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:controls="using:veterinariaInteligente.Controls"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              d:DataContext="{x:Static dt:DesignTimeData.Expediente}"
@@ -20,7 +21,8 @@
 
                 <StackPanel Spacing="3">
                     <TextBlock Text="Expediente" Classes="sectionTitle"/>
-                    <TextBlock Text="Resumen del paciente y su propietario" Classes="caption"/>
+                    <TextBlock Text="Resumen del paciente y su propietario" Classes="caption"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
 
                 <Border Classes="card">
@@ -35,8 +37,10 @@
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
                             <TextBlock Text="{Binding MascotaActual.Nombre}"
                                        FontSize="20" FontWeight="ExtraBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-ExtraBold.ttf#Nunito ExtraBold"
-                                       Foreground="{StaticResource NavyBrush}"/>
-                            <TextBlock Text="{Binding MascotaActual.Raza}" Classes="subsectionSoft"/>
+                                       Foreground="{StaticResource NavyBrush}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding MascotaActual.Raza}" Classes="subsectionSoft"
+                                       TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="8" VerticalAlignment="Center">
                             <Border Classes="chip" HorizontalAlignment="Right" Background="#EAFCEF">
@@ -52,35 +56,41 @@
                 <Border Classes="card">
                     <StackPanel Spacing="16">
                         <TextBlock Text="Datos generales" Classes="subsection"/>
-                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16"
-                              RowDefinitions="Auto,Auto" RowSpacing="14">
+                        <controls:ResponsiveColumnsGrid WideColumns="3" NarrowColumns="2"
+                                                        Breakpoint="620" Spacing="16" VerticalSpacing="14">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Raza" Classes="fieldLabel"/>
-                                <TextBlock Text="{Binding MascotaActual.Raza}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                <TextBlock Text="{Binding MascotaActual.Raza}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Spacing="4">
+                            <StackPanel Spacing="4">
                                 <TextBlock Text="Sexo" Classes="fieldLabel"/>
-                                <TextBlock Text="{Binding MascotaActual.Sexo}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                <TextBlock Text="{Binding MascotaActual.Sexo}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="2" Spacing="4">
+                            <StackPanel Spacing="4">
                                 <TextBlock Text="Color" Classes="fieldLabel"/>
-                                <TextBlock Text="{Binding MascotaActual.Color}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                <TextBlock Text="{Binding MascotaActual.Color}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Spacing="4">
+                            <StackPanel Spacing="4">
                                 <TextBlock Text="Alergias" Classes="fieldLabel"/>
                                 <TextBlock Text="{Binding MascotaActual.Alergia, TargetNullValue='Sin alergias conocidas'}"
-                                           FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                           FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
+                            <StackPanel Spacing="4">
                                 <TextBlock Text="Fecha de nacimiento" Classes="fieldLabel"/>
                                 <TextBlock Text="{Binding MascotaActual.FechaNacimiento, StringFormat='{}{0:dd/MM/yyyy}', TargetNullValue='No registrada'}"
-                                           FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                           FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Grid.Column="2" Spacing="4">
+                            <StackPanel Spacing="4">
                                 <TextBlock Text="Estado" Classes="fieldLabel"/>
-                                <TextBlock Text="{Binding MascotaActual.Estado.Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                <TextBlock Text="{Binding MascotaActual.Estado.Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                        </Grid>
+                        </controls:ResponsiveColumnsGrid>
                     </StackPanel>
                 </Border>
 
@@ -95,22 +105,25 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Top" Spacing="2">
-                                <TextBlock Text="{Binding DuenioActual.Nombre}" FontSize="15" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
-                                <TextBlock Text="{Binding DuenioActual.Telefono}" Classes="caption"/>
+                                <TextBlock Text="{Binding DuenioActual.Nombre}" FontSize="15" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                           TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding DuenioActual.Telefono}" Classes="caption" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Grid>
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1"
+                                                        Breakpoint="560" Spacing="16" VerticalSpacing="14">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Correo" Classes="fieldLabel"/>
                                 <TextBlock Text="{Binding DuenioActual.Correo, TargetNullValue='No registrado'}"
-                                           FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                           FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                           TextWrapping="Wrap"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Spacing="4">
+                            <StackPanel Spacing="4">
                                 <TextBlock Text="Dirección" Classes="fieldLabel"/>
                                 <TextBlock Text="{Binding DuenioActual.Direccion, TargetNullValue='No registrada'}"
                                            FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold" TextWrapping="Wrap"/>
                             </StackPanel>
-                        </Grid>
+                        </controls:ResponsiveColumnsGrid>
                     </StackPanel>
                 </Border>
 
@@ -121,9 +134,9 @@
                         <Border Background="#EAF6FD" CornerRadius="10" Padding="16,12">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="Las consultas de esta mascota se mostrarán aquí."
-                                           Classes="subsectionSoft"/>
+                                           Classes="subsectionSoft" TextWrapping="Wrap"/>
                                 <TextBlock Text="Este bloque se integra con el módulo m3 · Consultas (contrato: ConsultaService)."
-                                           Classes="caption"/>
+                                           Classes="caption" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:veterinariaInteligente.Controls"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              xmlns:vm="using:veterinariaInteligente.ViewModels"
              xmlns:models="using:veterinariaInteligente.Models"
@@ -15,10 +16,11 @@
             <StackPanel Spacing="20">
                 <StackPanel Spacing="3">
                     <TextBlock Text="Configuración" Classes="sectionTitle"/>
-                    <TextBlock Text="Profesionales, respaldos y documentos" Classes="caption"/>
+                    <TextBlock Text="Profesionales, respaldos y documentos" Classes="caption"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
 
-                <Grid ColumnDefinitions="390,*" ColumnSpacing="22">
+                <controls:ResponsiveTwoPane MinListWidth="260">
                     <Border Classes="card" Padding="20,18">
                         <StackPanel Spacing="12">
                             <TextBlock Text="Profesionales" Classes="subsection"/>
@@ -33,8 +35,10 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate x:DataType="models:Profesional">
                                         <StackPanel Spacing="2">
-                                            <TextBlock Text="{Binding Nombre}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="{Binding Cedula, TargetNullValue='Sin cédula'}" Classes="caption"/>
+                                            <TextBlock Text="{Binding Nombre}" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Cedula, TargetNullValue='Sin cédula'}" Classes="caption"
+                                                       TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -44,40 +48,41 @@
 
                     <Border Grid.Column="1" Classes="card" Padding="26,20">
                         <StackPanel Spacing="16">
-                            <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="10">
                                 <TextBlock Text="Datos del profesional" Classes="subsection"/>
-                                <Button Grid.Column="1" Classes="secondary small"
+                                <Button Classes="secondary small" HorizontalAlignment="Right"
                                         Command="{Binding NuevoProfesionalCommand}">Nuevo</Button>
-                            </Grid>
-                            <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                            </StackPanel>
+                            <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1"
+                                                            Breakpoint="420" Spacing="14">
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="Nombre" Classes="fieldLabel"/>
                                     <TextBox PlaceholderText="Nombre completo" Text="{Binding Nombre}"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="5">
+                                <StackPanel Spacing="5">
                                     <TextBlock Text="Cédula" Classes="fieldLabel"/>
                                     <TextBox PlaceholderText="Cédula profesional (opcional)" Text="{Binding Cedula}"/>
                                 </StackPanel>
-                            </Grid>
-                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                            </controls:ResponsiveColumnsGrid>
+                            <WrapPanel ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Right">
                                 <Button Classes="primary small" Command="{Binding AgregarProfesionalCommand}">Crear</Button>
                                 <Button Classes="primary small" Command="{Binding ActualizarProfesionalCommand}">Guardar</Button>
                                 <Button Classes="danger small" Command="{Binding DesactivarProfesionalCommand}">Desactivar</Button>
                                 <Button Classes="secondary small" Command="{Binding ActivarProfesionalCommand}">Activar</Button>
-                            </StackPanel>
+                            </WrapPanel>
                         </StackPanel>
                     </Border>
-                </Grid>
+                </controls:ResponsiveTwoPane>
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="22">
+                <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1" Breakpoint="640" Spacing="22">
                     <Border Classes="card" Padding="26,20">
                         <StackPanel Spacing="14">
                             <TextBlock Text="Respaldo de la base de datos" Classes="subsection"/>
-                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <StackPanel Spacing="8">
                                 <TextBox PlaceholderText="Carpeta de destino" Text="{Binding CarpetaRespaldo}"/>
-                                <Button Grid.Column="1" Classes="secondary small"
+                                <Button Classes="secondary small" HorizontalAlignment="Right"
                                         Command="{Binding SeleccionarCarpetaRespaldoCommand}">Elegir carpeta…</Button>
-                            </Grid>
+                            </StackPanel>
                             <Button Classes="primary small" HorizontalAlignment="Left"
                                     Command="{Binding CrearRespaldoCommand}">Crear respaldo</Button>
                             <TextBlock Text="{Binding RutaRespaldo, TargetNullValue=''}" Classes="caption" TextWrapping="Wrap"/>
@@ -87,16 +92,17 @@
                     <Border Grid.Column="1" Classes="card" Padding="26,20">
                         <StackPanel Spacing="14">
                             <TextBlock Text="Datos de la veterinaria" Classes="subsection"/>
-                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1"
+                                                            Breakpoint="420" Spacing="14">
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="Nombre" Classes="fieldLabel"/>
                                     <TextBox PlaceholderText="Nombre de la veterinaria" Text="{Binding NombreVeterinaria}"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="5">
+                                <StackPanel Spacing="5">
                                     <TextBlock Text="Teléfono" Classes="fieldLabel"/>
                                     <TextBox PlaceholderText="Teléfono" Text="{Binding TelefonoVeterinaria}"/>
                                 </StackPanel>
-                            </Grid>
+                            </controls:ResponsiveColumnsGrid>
                             <StackPanel Spacing="5">
                                 <TextBlock Text="Dirección" Classes="fieldLabel"/>
                                 <TextBox PlaceholderText="Dirección de la veterinaria" Text="{Binding DireccionVeterinaria}"/>
@@ -105,7 +111,7 @@
                                     Command="{Binding GuardarConfiguracionCommand}">Guardar datos</Button>
                         </StackPanel>
                     </Border>
-                </Grid>
+                </controls:ResponsiveColumnsGrid>
 
             </StackPanel>
         </ScrollViewer>

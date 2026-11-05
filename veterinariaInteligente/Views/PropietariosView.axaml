@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:controls="using:veterinariaInteligente.Controls"
              xmlns:models="using:veterinariaInteligente.Models"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
@@ -24,8 +25,9 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                        <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
-                        <TextBlock Text="{Binding Raza}" Classes="caption"/>
+                        <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding Raza}" Classes="caption" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Text="{Binding FechaArchivado, StringFormat='Archivada desde {0:dd/MM/yyyy}', TargetNullValue=''}"
                                    Classes="caption"/>
                     </StackPanel>
@@ -51,15 +53,16 @@
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="3">
                     <TextBlock Text="Dueños y mascotas" Classes="sectionTitle"/>
-                    <TextBlock Text="Gestión de propietarios y sus mascotas" Classes="caption"/>
+                    <TextBlock Text="Gestión de propietarios y sus mascotas" Classes="caption"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <WrapPanel Grid.Column="1" ItemSpacing="10" LineSpacing="8" VerticalAlignment="Center">
                     <CheckBox Classes="filtro" Content="Ver archivados" IsChecked="{Binding MostrandoArchivados}"/>
                     <Button Classes="secondary small" Command="{Binding RestaurarPropietarioCommand}">Restaurar seleccionado</Button>
-                </StackPanel>
+                </WrapPanel>
             </Grid>
 
-            <Grid Grid.Row="1" ColumnDefinitions="390,*" ColumnSpacing="22">
+            <controls:ResponsiveTwoPane Grid.Row="1">
 
                 <Border Classes="card" Grid.Column="0" Padding="0">
                     <Grid RowDefinitions="Auto,Auto,Auto,*">
@@ -73,7 +76,8 @@
                         <TextBlock Grid.Row="2" Text="Selecciona un propietario"
                                    Classes="caption" Margin="20,10,20,0"/>
 
-                        <StackPanel Grid.Row="3" Spacing="8" Margin="8,6,8,12">
+                        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="8" Margin="8,6,8,12">
                             <TextBlock Text="Activos" Classes="fieldLabel" Margin="8,0,0,0"/>
                             <ListBox x:Name="PropietariosActivosList" Classes="ownerList"
                                      ItemsSource="{Binding PropietariosActivos}" MaxHeight="360"
@@ -91,8 +95,9 @@
                                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
-                                                <TextBlock Text="{Binding Telefono}" Classes="caption"/>
+                                                <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Telefono}" Classes="caption" TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
                                             <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
                                                     Background="{StaticResource SuccessBrush}">
@@ -116,9 +121,11 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate x:DataType="models:Duenio">
                                                 <StackPanel Spacing="2">
-                                                    <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="{Binding Telefono}" Classes="caption"/>
-                                                    <TextBlock Text="{Binding FechaArchivado, StringFormat='Archivado desde {0:dd/MM/yyyy}'}" Classes="caption"/>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Telefono}" Classes="caption" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding FechaArchivado, StringFormat='Archivado desde {0:dd/MM/yyyy}'}" Classes="caption"
+                                                               TextWrapping="Wrap"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -126,6 +133,7 @@
                                 </StackPanel>
                             </Border>
                         </StackPanel>
+                        </ScrollViewer>
 
                     </Grid>
                 </Border>
@@ -136,16 +144,17 @@
                         <Border Classes="card">
                             <StackPanel Spacing="16">
                                 <TextBlock Text="Nuevo propietario" Classes="subsection"/>
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                                <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1"
+                                                                Breakpoint="440" Spacing="16" VerticalSpacing="14">
                                     <TextBox PlaceholderText="Nombre del nuevo propietario"
                                              Text="{Binding NuevoPropietarioNombre}"/>
-                                    <TextBox Grid.Column="1" PlaceholderText="Teléfono del nuevo propietario"
+                                    <TextBox PlaceholderText="Teléfono del nuevo propietario"
                                              Text="{Binding NuevoPropietarioTelefono}"/>
-                                    <TextBox Grid.Row="1" PlaceholderText="Correo del nuevo propietario (opcional)"
+                                    <TextBox PlaceholderText="Correo del nuevo propietario (opcional)"
                                              Text="{Binding NuevoPropietarioCorreo}"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" PlaceholderText="Dirección del nuevo propietario (opcional)"
+                                    <TextBox PlaceholderText="Dirección del nuevo propietario (opcional)"
                                              Text="{Binding NuevoPropietarioDireccion}"/>
-                                </Grid>
+                                </controls:ResponsiveColumnsGrid>
                                 <Button Classes="primary small" HorizontalAlignment="Right"
                                         Command="{Binding AgregarPropietarioCommand}">Guardar nuevo propietario</Button>
                             </StackPanel>
@@ -153,51 +162,52 @@
 
                         <Border Classes="card">
                             <StackPanel Spacing="16">
-                                <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="10">
                                     <TextBlock Text="Datos del propietario" Classes="subsection"/>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                    <WrapPanel ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Right">
                                         <Button Classes="primary small" Command="{Binding ActualizarPropietarioCommand}">Guardar</Button>
                                         <Button Classes="danger small" Command="{Binding ArchivarPropietarioCommand}">Archivar</Button>
-                                    </StackPanel>
-                                </Grid>
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                                    </WrapPanel>
+                                </StackPanel>
+                                <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1"
+                                                                Breakpoint="440" Spacing="16" VerticalSpacing="14">
                                     <StackPanel Spacing="5">
                                         <TextBlock Text="Nombre" Classes="fieldLabel"/>
                                         <TextBox PlaceholderText="Nombre completo"
                                                  Text="{Binding SelectedPropietario.Nombre}"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Spacing="5">
+                                    <StackPanel Spacing="5">
                                         <TextBlock Text="Teléfono" Classes="fieldLabel"/>
                                         <TextBox PlaceholderText="Teléfono"
                                                  Text="{Binding SelectedPropietario.Telefono}"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Row="1" Spacing="5">
+                                    <StackPanel Spacing="5">
                                         <TextBlock Text="Correo" Classes="fieldLabel"/>
                                         <TextBox PlaceholderText="correo@ejemplo.com"
                                                  Text="{Binding SelectedPropietario.Correo}"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
+                                    <StackPanel Spacing="5">
                                         <TextBlock Text="Dirección" Classes="fieldLabel"/>
                                         <TextBox PlaceholderText="Dirección"
                                                  Text="{Binding SelectedPropietario.Direccion}"/>
                                     </StackPanel>
-                                </Grid>
+                                </controls:ResponsiveColumnsGrid>
                             </StackPanel>
                         </Border>
 
                         <Border Classes="card">
                             <StackPanel Spacing="16">
 
-                                <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="10">
                                     <TextBlock Text="Mascotas del propietario" Classes="subsection"/>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                    <WrapPanel ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Right">
                                         <Button Classes="danger small" Command="{Binding ArchivarMascotaCommand}">Archivar seleccionada</Button>
                                         <Button Classes="secondary small" Command="{Binding RestaurarMascotaCommand}">Restaurar mascota</Button>
                                         <Button Classes="primary small" Command="{Binding AbrirExpedienteCommand}">
                                             Abrir expediente
                                         </Button>
-                                    </StackPanel>
-                                </Grid>
+                                    </WrapPanel>
+                                </StackPanel>
 
                                 <Border Classes="cardFlat" Background="{StaticResource SurfaceAltBrush}">
                                     <StackPanel Spacing="12">
@@ -284,7 +294,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-            </Grid>
+            </controls:ResponsiveTwoPane>
         </Grid>
     </Border>
 </UserControl>

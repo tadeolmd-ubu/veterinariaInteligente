@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:controls="using:veterinariaInteligente.Controls"
              xmlns:models="using:veterinariaInteligente.Models"
              xmlns:enums="using:veterinariaInteligente.Models.Enums"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
@@ -25,11 +26,12 @@
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="3">
                     <TextBlock Text="Citas" Classes="sectionTitle"/>
-                    <TextBlock Text="Agenda de atenciones y citas programadas" Classes="caption"/>
+                    <TextBlock Text="Agenda de atenciones y citas programadas" Classes="caption"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1" ColumnDefinitions="390,*" ColumnSpacing="22">
+            <controls:ResponsiveTwoPane Grid.Row="1">
 
                 <Border Classes="card" Grid.Column="0" Padding="0">
                     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
@@ -48,7 +50,7 @@
                                              Command="{Binding CargarAgendaCommand}">Actualizar agenda</Button>
                                  </StackPanel>
                             </StackPanel>
-                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                            <WrapPanel ItemSpacing="8" LineSpacing="8">
                                 <Button Classes="chipTab" Command="{Binding VerCitasActivasCommand}">
                                     <Button.Background>
                                         <MultiBinding Converter="{StaticResource CitasTabFondo}" ConverterParameter="activas">
@@ -64,7 +66,7 @@
                                     </Button.Foreground>
                                     Activas
                                 </Button>
-                                <Button Grid.Column="1" Classes="chipTab" Command="{Binding CargarAgendaCommand}">
+                                <Button Classes="chipTab" Command="{Binding CargarAgendaCommand}">
                                     <Button.Background>
                                         <MultiBinding Converter="{StaticResource CitasTabFondo}" ConverterParameter="agenda">
                                             <Binding Path="MostrandoAgenda"/>
@@ -79,7 +81,7 @@
                                     </Button.Foreground>
                                     Agenda
                                 </Button>
-                                <Button Grid.Column="2" Classes="chipTab" Command="{Binding VerCitasCanceladasCommand}">
+                                <Button Classes="chipTab" Command="{Binding VerCitasCanceladasCommand}">
                                     <Button.Background>
                                         <MultiBinding Converter="{StaticResource CitasTabFondo}" ConverterParameter="canceladas">
                                             <Binding Path="MostrandoAgenda"/>
@@ -94,7 +96,7 @@
                                     </Button.Foreground>
                                     Canceladas
                                 </Button>
-                            </Grid>
+                            </WrapPanel>
                         </StackPanel>
 
                         <TextBlock Grid.Row="2" Text="Selecciona una cita"
@@ -146,15 +148,15 @@
 
                         <Border Classes="card">
                             <StackPanel Spacing="16">
-                                <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="10">
                                     <TextBlock Text="Detalle de la cita" Classes="subsection"/>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                    <WrapPanel ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Right">
                                         <Button Classes="secondary small" Command="{Binding NuevaCitaCommand}">Nueva</Button>
                                         <Button Classes="primary small" Command="{Binding AgregarCitaCommand}">Crear</Button>
                                         <Button Classes="danger small" Command="{Binding CancelarCitaCommand}">Cancelar cita</Button>
                                         <Button Classes="primary small" Command="{Binding ActualizarCitaCommand}">Guardar</Button>
-                                    </StackPanel>
-                                </Grid>
+                                    </WrapPanel>
+                                </StackPanel>
                                 <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
                                     <StackPanel Spacing="5">
                                         <TextBlock Text="Mascota" Classes="fieldLabel"/>
@@ -186,12 +188,12 @@
                                                 </DataTemplate>
                                             </ComboBox.ItemTemplate>
                                         </ComboBox>
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <WrapPanel ItemSpacing="8" LineSpacing="8">
                                             <Button Classes="secondary small"
                                                     Command="{Binding CambiarEstadoCitaCommand}">Aplicar</Button>
                                             <Button Classes="primary small" IsVisible="{Binding PuedeReactivar}"
                                                     Command="{Binding ReactivarCitaCommand}">Reactivar cita</Button>
-                                        </StackPanel>
+                                        </WrapPanel>
                                     </StackPanel>
                                     <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="5">
                                         <TextBlock Text="Motivo" Classes="fieldLabel"/>
@@ -210,7 +212,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-            </Grid>
+            </controls:ResponsiveTwoPane>
         </Grid>
     </Border>
 </UserControl>

@@ -10,6 +10,14 @@ namespace veterinariaInteligente.Service;
 
 public class PdfService
 {
+    static PdfService()
+    {
+        // QuestPDF exige declarar la licencia antes de generar el primer documento.
+        // Community: gratis para particulares, proyectos académicos/open source
+        // y organizaciones con ingresos anuales menores a 1 millón de USD.
+        QuestPDF.Settings.License = LicenseType.Community;
+    }
+
     private readonly AppDbContext _db;
 
     public PdfService(AppDbContext db) => _db = db;
