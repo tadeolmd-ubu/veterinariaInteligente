@@ -178,6 +178,7 @@
 
             <Border Grid.Row="2" Padding="18,10" Background="#26000000">
                 <TextBlock Text="{Binding TextoVersionMenu}"
+                           ToolTip.Tip="Versión instalada"
                            FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
                            Foreground="{StaticResource NavyBrush}"
                            HorizontalAlignment="Center"/>
