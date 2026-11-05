@@ -81,16 +81,27 @@ internal static class UpdateService
             await File.WriteAllTextAsync(script, """
                 param([int]$AppProcessId, [string]$Source, [string]$Destination)
                 $ErrorActionPreference = 'Stop'
+                $robocopyExitCode = 'No ejecutado'
+                $robocopyLog = Join-Path $PSScriptRoot 'robocopy.log'
                 try {
                     Wait-Process -Id $AppProcessId -ErrorAction SilentlyContinue
-                    & robocopy $Source $Destination /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm
-                    if ($LASTEXITCODE -ge 8) { throw 'No se pudo copiar la actualización.' }
+                    & robocopy $Source $Destination /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm "/LOG:$robocopyLog"
+                    $robocopyExitCode = $LASTEXITCODE
+                    if ($robocopyExitCode -ge 8) {
+                        throw "Robocopy falló con código $robocopyExitCode."
+                    }
                     Start-Process -FilePath (Join-Path $Destination 'veterinariaInteligente.exe') -WorkingDirectory $Destination
                     Remove-Item $PSScriptRoot -Recurse -Force -ErrorAction SilentlyContinue
                 } catch {
-                    $_ | Out-File (Join-Path $PSScriptRoot 'error.log')
+                    @(
+                        "Origen: $Source"
+                        "Destino: $Destination"
+                        "Código de Robocopy: $robocopyExitCode"
+                        ''
+                        ($_ | Out-String)
+                    ) | Set-Content -Path (Join-Path $PSScriptRoot 'error.log')
                     Add-Type -AssemblyName PresentationFramework
-                    [System.Windows.MessageBox]::Show("No se pudo instalar la actualización. Detalles en $PSScriptRoot\error.log", 'Error de actualización')
+                    [System.Windows.MessageBox]::Show("No se pudo instalar la actualización. Revisa error.log y robocopy.log en:`n$PSScriptRoot", 'Error de actualización')
                 }
                 """);
             var start = new ProcessStartInfo
