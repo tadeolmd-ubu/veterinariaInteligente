@@ -13,6 +13,36 @@
 
     <UserControl.Resources>
         <conv:InicialesConverter x:Key="Iniciales"/>
+        <DataTemplate x:Key="MascotaCardTemplate" x:DataType="models:Mascota">
+            <Border Classes="cardFlat" Width="248" Margin="0,0,12,12">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto">
+                    <Border Width="44" Height="44" CornerRadius="22"
+                            Background="{StaticResource PrimaryButtonBrush}">
+                        <TextBlock Text="{Binding Nombre, Converter={StaticResource Iniciales}}"
+                                   FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                   Foreground="{StaticResource SurfaceBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                        <TextBlock Text="{Binding Raza}" Classes="caption"/>
+                        <TextBlock Text="{Binding FechaArchivado, StringFormat='Archivada desde {0:dd/MM/yyyy}', TargetNullValue=''}"
+                                   Classes="caption"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="6" Margin="1,10,0,0">
+                        <Border Classes="chip" Background="#EAF6FF">
+                            <TextBlock Text="{Binding Sexo}" FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                       Foreground="{StaticResource NavyBrush}"/>
+                        </Border>
+                        <Border Classes="chip" Background="#EAFCEF">
+                            <TextBlock Text="{Binding Estado.Nombre}"
+                                       FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
+                                       Foreground="{StaticResource SuccessBrush}"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
@@ -43,33 +73,59 @@
                         <TextBlock Grid.Row="2" Text="Selecciona un propietario"
                                    Classes="caption" Margin="20,10,20,0"/>
 
-                        <ListBox Grid.Row="3" Classes="ownerList" Margin="8,6,8,12"
-                                 ItemsSource="{Binding PropietariosItems}"
-                                 SelectedItem="{Binding SelectedPropietario}"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate x:DataType="models:Duenio">
-                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                                        <Border Width="42" Height="42" CornerRadius="21"
-                                                Background="{StaticResource PrimaryButtonBrush}">
-                                            <TextBlock Text="{Binding Nombre, Converter={StaticResource Iniciales}}"
-                                                       FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
-                                                       Foreground="{StaticResource SurfaceBrush}"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                            <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
-                                            <TextBlock Text="{Binding Telefono}" Classes="caption"/>
-                                        </StackPanel>
-                                        <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
-                                                Background="{StaticResource SuccessBrush}">
-                                            <TextBlock Text="{Binding Mascotas.Count, StringFormat={}{0} masc}"
-                                                       FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold" Foreground="{StaticResource SurfaceBrush}"/>
-                                        </Border>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                        <StackPanel Grid.Row="3" Spacing="8" Margin="8,6,8,12">
+                            <TextBlock Text="Activos" Classes="fieldLabel" Margin="8,0,0,0"/>
+                            <ListBox x:Name="PropietariosActivosList" Classes="ownerList"
+                                     ItemsSource="{Binding PropietariosActivos}" MaxHeight="360"
+                                     SelectionChanged="Propietarios_SelectionChanged"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Duenio">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                            <Border Width="42" Height="42" CornerRadius="21"
+                                                    Background="{StaticResource PrimaryButtonBrush}">
+                                                <TextBlock Text="{Binding Nombre, Converter={StaticResource Iniciales}}"
+                                                           FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                                           Foreground="{StaticResource SurfaceBrush}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                                <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
+                                                <TextBlock Text="{Binding Telefono}" Classes="caption"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
+                                                    Background="{StaticResource SuccessBrush}">
+                                                <TextBlock Text="{Binding Mascotas.Count, StringFormat={}{0} masc}"
+                                                           FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold" Foreground="{StaticResource SurfaceBrush}"/>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <Border IsVisible="{Binding MostrandoArchivados}" Background="{StaticResource SurfaceAltBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Archivados" Classes="fieldLabel" Margin="4,0,0,0"/>
+                                    <ListBox x:Name="PropietariosArchivadosList" Classes="ownerList"
+                                             ItemsSource="{Binding PropietariosArchivados}" MaxHeight="170"
+                                             SelectionChanged="Propietarios_SelectionChanged"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:Duenio">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding Telefono}" Classes="caption"/>
+                                                    <TextBlock Text="{Binding FechaArchivado, StringFormat='Archivado desde {0:dd/MM/yyyy}'}" Classes="caption"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
                     </Grid>
                 </Border>
@@ -92,7 +148,6 @@
                                 </Grid>
                                 <Button Classes="primary small" HorizontalAlignment="Right"
                                         Command="{Binding AgregarPropietarioCommand}">Guardar nuevo propietario</Button>
-                                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                             </StackPanel>
                         </Border>
 
@@ -127,7 +182,6 @@
                                                  Text="{Binding SelectedPropietario.Direccion}"/>
                                     </StackPanel>
                                 </Grid>
-                                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                             </StackPanel>
                         </Border>
 
@@ -138,6 +192,7 @@
                                     <TextBlock Text="Mascotas del propietario" Classes="subsection"/>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                                         <Button Classes="danger small" Command="{Binding ArchivarMascotaCommand}">Archivar seleccionada</Button>
+                                        <Button Classes="secondary small" Command="{Binding RestaurarMascotaCommand}">Restaurar mascota</Button>
                                         <Button Classes="primary small" Command="{Binding AbrirExpedienteCommand}">
                                             Abrir expediente
                                         </Button>
@@ -147,32 +202,41 @@
                                 <Border Classes="cardFlat" Background="{StaticResource SurfaceAltBrush}">
                                     <StackPanel Spacing="12">
                                         <TextBlock Text="+ Nueva mascota" Classes="subsectionSoft"/>
-                                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12"
-                                              RowDefinitions="Auto,Auto" RowSpacing="12">
-                                            <StackPanel Spacing="5">
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12"
+                                              RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                                            <Grid Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <StackPanel Spacing="5">
+                                                    <TextBlock Text="Propietario" Classes="fieldLabel"/>
+                                                    <TextBox Text="{Binding NombreDuenioMascota}" IsReadOnly="True"
+                                                             PlaceholderText="Elige un propietario"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Classes="secondary small" VerticalAlignment="Bottom"
+                                                        Command="{Binding SeleccionarDuenioMascotaCommand}">Elegir dueño…</Button>
+                                            </Grid>
+                                            <StackPanel Grid.Row="1" Spacing="5">
                                                 <TextBlock Text="Nombre" Classes="fieldLabel"/>
                                                 <TextBox PlaceholderText="Nombre" Text="{Binding NuevaMascotaNombre}"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Column="1" Spacing="5">
+                                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
                                                 <TextBlock Text="Raza" Classes="fieldLabel"/>
                                                 <TextBox PlaceholderText="Raza" Text="{Binding NuevaMascotaRaza}"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Column="2" Spacing="5">
+                                            <StackPanel Grid.Row="2" Spacing="5">
                                                 <TextBlock Text="Sexo" Classes="fieldLabel"/>
                                                 <ComboBox ItemsSource="{Binding SexosMascota}"
                                                           SelectedItem="{Binding NuevaMascotaSexo}"
                                                           HorizontalAlignment="Stretch"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Row="1" Spacing="5">
+                                            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="5">
                                                 <TextBlock Text="Color" Classes="fieldLabel"/>
                                                 <TextBox PlaceholderText="Color" Text="{Binding NuevaMascotaColor}"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
+                                            <StackPanel Grid.Row="3" Spacing="5">
                                                 <TextBlock Text="Alergias" Classes="fieldLabel"/>
                                                 <TextBox PlaceholderText="Alergias (opcional)"
                                                          Text="{Binding NuevaMascotaAlergia}"/>
                                             </StackPanel>
-                                            <StackPanel Grid.Row="1" Grid.Column="2" Spacing="5">
+                                            <StackPanel Grid.Row="3" Grid.Column="1" Spacing="5">
                                                 <TextBlock Text="Fecha de nacimiento" Classes="fieldLabel"/>
                                                 <DatePicker SelectedDate="{Binding NuevaMascotaFechaNacimiento}"/>
                                             </StackPanel>
@@ -183,45 +247,36 @@
                                     </StackPanel>
                                 </Border>
 
-                                <ListBox Classes="mascotaList" ItemsSource="{Binding MascotasItems}"
-                                         SelectedItem="{Binding SelectedMascota}">
+                                <TextBlock Text="Activas" Classes="fieldLabel"/>
+                                <ListBox x:Name="MascotasActivasList" Classes="mascotaList" ItemsSource="{Binding MascotasActivas}"
+                                         MaxHeight="300" SelectionChanged="Mascotas_SelectionChanged"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                     <ListBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel ItemWidth="260"/>
-                                        </ItemsPanelTemplate>
+                                        <ItemsPanelTemplate><WrapPanel ItemWidth="260"/></ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate x:DataType="models:Mascota">
-                                            <Border Classes="cardFlat" Width="248" Margin="0,0,12,12">
-                                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto">
-                                                    <Border Width="44" Height="44" CornerRadius="22"
-                                                            Background="{StaticResource PrimaryButtonBrush}">
-                                                        <TextBlock Text="{Binding Nombre, Converter={StaticResource Iniciales}}"
-                                                                   FontSize="14" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
-                                                                   Foreground="{StaticResource SurfaceBrush}"
-                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Border>
-                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                                        <TextBlock Text="{Binding Nombre}" FontSize="14" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"/>
-                                                        <TextBlock Text="{Binding Raza}" Classes="caption"/>
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2"
-                                                                Orientation="Horizontal" Spacing="6" Margin="1,10,0,0">
-                                                        <Border Classes="chip" Background="#EAF6FF">
-                                                            <TextBlock Text="{Binding Sexo}" FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                                                       Foreground="{StaticResource NavyBrush}"/>
-                                                        </Border>
-                                                        <Border Classes="chip" Background="#EAFCEF">
-                                                            <TextBlock Text="{Binding Estado.Nombre}"
-                                                                       FontSize="11" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
-                                                                       Foreground="{StaticResource SuccessBrush}"/>
-                                                        </Border>
-                                                    </StackPanel>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
+                                    <ListBox.ItemTemplate><StaticResource ResourceKey="MascotaCardTemplate"/></ListBox.ItemTemplate>
                                 </ListBox>
+
+                                <Border IsVisible="{Binding MostrandoArchivados}" Background="{StaticResource SurfaceAltBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="12">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Mascotas archivadas" Classes="fieldLabel"/>
+                                        <ListBox x:Name="MascotasArchivadasList" Classes="mascotaList" ItemsSource="{Binding MascotasArchivadas}"
+                                                 MaxHeight="240" SelectionChanged="Mascotas_SelectionChanged"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate><WrapPanel ItemWidth="260"/></ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemTemplate><StaticResource ResourceKey="MascotaCardTemplate"/></ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </StackPanel>
+                                </Border>
+
+                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                    <Button Classes="secondary small" Command="{Binding GenerarExpedientePdfCommand}">Generar expediente PDF</Button>
+                                </StackPanel>
 
                             </StackPanel>
                         </Border>

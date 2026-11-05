@@ -26,6 +26,7 @@
                     <TextBlock Text="Catálogo de vacunas y aplicaciones por mascota" Classes="caption"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Classes="secondary" Command="{Binding GenerarCartillaPdfCommand}">Generar cartilla PDF</Button>
                     <Button Classes="primary" Command="{Binding NuevaVacunaCommand}">Nueva vacuna</Button>
                 </StackPanel>
             </Grid>
@@ -46,9 +47,10 @@
                         <TextBlock Grid.Row="2" Text="Selecciona una vacuna" Classes="caption"/>
 
                         <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4"
-                                 ItemsSource="{Binding VacunasItems}"
-                                 SelectedItem="{Binding SelectedVacuna}"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                  ItemsSource="{Binding VacunasItems}"
+                                  SelectedItem="{Binding SelectedVacuna}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:Vacuna">
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
@@ -95,7 +97,6 @@
                                 <Button Classes="danger small" Command="{Binding DesactivarVacunaCommand}">Desactivar</Button>
                                 <Button Classes="primary small" Command="{Binding ActivarVacunaCommand}">Activar</Button>
                             </StackPanel>
-                            <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                         </StackPanel>
 
                     </Grid>
@@ -106,8 +107,6 @@
 
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock Text="Aplicaciones" Classes="subsection"/>
-                            <Button Grid.Column="1" Classes="secondary small"
-                                    Command="{Binding NuevaAplicacionCommand}">Aplicar vacuna</Button>
                         </Grid>
 
                         <StackPanel Grid.Row="1" Spacing="5">
@@ -122,9 +121,10 @@
                         <TextBlock Grid.Row="2" Text="Selecciona una aplicación" Classes="caption"/>
 
                         <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4"
-                                 ItemsSource="{Binding AplicacionesItems}"
-                                 SelectedItem="{Binding SelectedAplicacion}"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                  ItemsSource="{Binding AplicacionesItems}"
+                                  SelectedItem="{Binding SelectedAplicacion}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:AplicacionVacuna">
                                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
@@ -207,7 +207,6 @@
                                 <Button Classes="primary small" Command="{Binding AgregarAplicacionCommand}">Aplicar</Button>
                                 <Button Classes="ghost small" Command="{Binding ActualizarAplicacionCommand}">Guardar</Button>
                             </StackPanel>
-                            <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                         </StackPanel>
 
                     </Grid>

@@ -59,6 +59,7 @@
                         <ListBox Grid.Row="3" Classes="consultasList" Margin="8,6,8,12"
                                  ItemsSource="{Binding ConsultasItems}"
                                  SelectedItem="{Binding SelectedConsulta}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:Consulta">
@@ -104,6 +105,7 @@
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Text="Detalle de la consulta" Classes="subsection"/>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="secondary small" Command="{Binding GenerarConsultaPdfCommand}">Generar PDF</Button>
                                         <Button Classes="primary small" Command="{Binding AgregarConsultaCommand}">Crear</Button>
                                         <Button Classes="secondary small" Command="{Binding RestaurarConsultaCommand}">Restaurar</Button>
                                         <Button Classes="danger small" Command="{Binding ArchivarConsultaCommand}">Archivar</Button>
@@ -154,14 +156,14 @@
                                                  AcceptsReturn="True" TextWrapping="Wrap" Height="88"/>
                                     </StackPanel>
                                 </Grid>
-                                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                             </StackPanel>
                         </Border>
 
                         <Border Classes="card">
                             <StackPanel Spacing="14">
                                 <TextBlock Text="Historial de la consulta" Classes="subsection"/>
-                                <ItemsControl ItemsSource="{Binding SelectedConsulta.Versiones}">
+                                <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                  <ItemsControl ItemsSource="{Binding SelectedConsulta.Versiones}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="models:ConsultaVersion">
                                             <Border Margin="0,0,8,10" Padding="14,12"
@@ -189,7 +191,8 @@
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                  </ItemsControl>
+                                </ScrollViewer>
                             </StackPanel>
                         </Border>
 

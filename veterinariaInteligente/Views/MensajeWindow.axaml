@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="veterinariaInteligente.Views.MensajeWindow"
+        Title="PawDesk"
+        Width="440" SizeToContent="Height" MinHeight="230" MaxHeight="480"
+        CanResize="False" WindowStartupLocation="CenterOwner"
+        Background="{StaticResource ContentBackgroundBrush}">
+    <Border Classes="card" Margin="18" Padding="24">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="18">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                <Border Width="42" Height="42" CornerRadius="21" Background="{StaticResource PrimaryButtonBrush}">
+                    <TextBlock x:Name="Icono" Text="✓" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource SurfaceBrush}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="Titulo" Grid.Column="1" Classes="subsection"
+                           VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </Grid>
+            <ScrollViewer Grid.Row="1" MaxHeight="280" VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="TextoMensaje" TextWrapping="Wrap"/>
+            </ScrollViewer>
+            <Button Grid.Row="2" Classes="primary small" HorizontalAlignment="Right"
+                    MinWidth="100" Click="Aceptar_Click">Aceptar</Button>
+        </Grid>
+    </Border>
+</Window>

@@ -38,12 +38,14 @@
                                        Foreground="{StaticResource NavyBrush}"/>
                             <TextBlock Text="{Binding MascotaActual.Raza}" Classes="subsectionSoft"/>
                         </StackPanel>
-                        <Border Grid.Column="2" Classes="chip" VerticalAlignment="Center"
-                                Background="#EAFCEF">
-                            <TextBlock Text="{Binding MascotaActual.Estado.Nombre}"
-                                       FontSize="12" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
-                                       Foreground="{StaticResource SuccessBrush}"/>
-                        </Border>
+                        <StackPanel Grid.Column="2" Spacing="8" VerticalAlignment="Center">
+                            <Border Classes="chip" HorizontalAlignment="Right" Background="#EAFCEF">
+                                <TextBlock Text="{Binding MascotaActual.Estado.Nombre}"
+                                           FontSize="12" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                           Foreground="{StaticResource SuccessBrush}"/>
+                            </Border>
+                            <Button Classes="secondary small" Command="{Binding GenerarExpedientePdfCommand}">Generar PDF</Button>
+                        </StackPanel>
                     </Grid>
                 </Border>
 

@@ -58,8 +58,6 @@
 
                 </Grid>
 
-                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption" TextWrapping="Wrap"/>
-
             </StackPanel>
         </ScrollViewer>
     </Border>

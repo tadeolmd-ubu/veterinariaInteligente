@@ -27,8 +27,9 @@
                             <CheckBox Classes="filtro" Content="Ver inactivos"
                                       IsChecked="{Binding MostrandoInactivos}"/>
                             <ListBox ItemsSource="{Binding ProfesionalesItems}"
-                                     SelectedItem="{Binding SelectedProfesional}"
-                                     MinHeight="180" MaxHeight="300">
+                                      SelectedItem="{Binding SelectedProfesional}"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      MinHeight="180" MaxHeight="300">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate x:DataType="models:Profesional">
                                         <StackPanel Spacing="2">
@@ -72,7 +73,11 @@
                     <Border Classes="card" Padding="26,20">
                         <StackPanel Spacing="14">
                             <TextBlock Text="Respaldo de la base de datos" Classes="subsection"/>
-                            <TextBox PlaceholderText="Carpeta de destino" Text="{Binding CarpetaRespaldo}"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox PlaceholderText="Carpeta de destino" Text="{Binding CarpetaRespaldo}"/>
+                                <Button Grid.Column="1" Classes="secondary small"
+                                        Command="{Binding SeleccionarCarpetaRespaldoCommand}">Elegir carpeta…</Button>
+                            </Grid>
                             <Button Classes="primary small" HorizontalAlignment="Left"
                                     Command="{Binding CrearRespaldoCommand}">Crear respaldo</Button>
                             <TextBlock Text="{Binding RutaRespaldo, TargetNullValue=''}" Classes="caption" TextWrapping="Wrap"/>
@@ -81,26 +86,27 @@
 
                     <Border Grid.Column="1" Classes="card" Padding="26,20">
                         <StackPanel Spacing="14">
-                            <TextBlock Text="Generar documentos PDF" Classes="subsection"/>
-                            <ComboBox ItemsSource="{Binding MascotasItems}"
-                                      SelectedItem="{Binding SelectedMascota}"
-                                      DisplayMemberBinding="{Binding Nombre}"
-                                      PlaceholderText="Selecciona una mascota"/>
-                            <ComboBox ItemsSource="{Binding ConsultasItems}"
-                                      SelectedItem="{Binding SelectedConsulta}"
-                                      DisplayMemberBinding="{Binding Motivo}"
-                                      PlaceholderText="Selecciona una consulta"/>
-                            <WrapPanel ItemSpacing="8" LineSpacing="8">
-                                <Button Classes="primary small" Command="{Binding GenerarConsultaPdfCommand}">Consulta</Button>
-                                <Button Classes="primary small" Command="{Binding GenerarExpedientePdfCommand}">Expediente</Button>
-                                <Button Classes="primary small" Command="{Binding GenerarCartillaPdfCommand}">Cartilla</Button>
-                            </WrapPanel>
-                            <TextBlock Text="{Binding NombreArchivoPdf, TargetNullValue=''}" Classes="caption"/>
+                            <TextBlock Text="Datos de la veterinaria" Classes="subsection"/>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Nombre" Classes="fieldLabel"/>
+                                    <TextBox PlaceholderText="Nombre de la veterinaria" Text="{Binding NombreVeterinaria}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="Teléfono" Classes="fieldLabel"/>
+                                    <TextBox PlaceholderText="Teléfono" Text="{Binding TelefonoVeterinaria}"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="Dirección" Classes="fieldLabel"/>
+                                <TextBox PlaceholderText="Dirección de la veterinaria" Text="{Binding DireccionVeterinaria}"/>
+                            </StackPanel>
+                            <Button Classes="primary small" HorizontalAlignment="Right"
+                                    Command="{Binding GuardarConfiguracionCommand}">Guardar datos</Button>
                         </StackPanel>
                     </Border>
                 </Grid>
 
-                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption" TextWrapping="Wrap"/>
             </StackPanel>
         </ScrollViewer>
     </Border>
