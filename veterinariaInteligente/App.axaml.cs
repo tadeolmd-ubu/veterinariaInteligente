@@ -74,7 +74,8 @@ public partial class App : Application
                 consultasViewModel,
                 consultaService,
                 new ConfiguracionViewModel(profesionalService, new RespaldoService(dbContext),
-                    new PdfService(dbContext), mascotaService, consultaService),
+                    new PdfService(dbContext), mascotaService, consultaService,
+                    new ConfiguracionClienteService(dbContext)),
                 new InicioViewModel(duenioService, mascotaService, citaService,
                     new SeguimientoService(dbContext)));
 

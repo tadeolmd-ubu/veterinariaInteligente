@@ -9,8 +9,8 @@
         x:Class="veterinariaInteligente.MainWindow"
         Title="PawDesk"
         Icon="avares://veterinariaInteligente/Assets/Logo.ico"
-        Width="1280" Height="800"
-        MinWidth="1100" MinHeight="700"
+        Width="1659" Height="967"
+        MinWidth="900" MinHeight="560"
         Background="{StaticResource ContentBackgroundBrush}">
 
     <Window.DataTemplates>

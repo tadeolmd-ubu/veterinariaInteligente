@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="using:veterinariaInteligente.Models"
+        x:Class="veterinariaInteligente.Views.SeleccionPropietarioWindow"
+        Title="Seleccionar propietario"
+        Width="520" Height="540" MinWidth="420" MinHeight="420"
+        CanResize="False" WindowStartupLocation="CenterOwner"
+        Background="{StaticResource ContentBackgroundBrush}">
+    <Border Classes="card" Margin="18" Padding="22">
+        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="14">
+            <StackPanel Spacing="3">
+                <TextBlock Text="¿Quién es el propietario?" Classes="sectionTitle" FontSize="20"/>
+                <TextBlock Text="Selecciona un propietario activo para asociar la mascota." Classes="caption"/>
+            </StackPanel>
+            <TextBox Grid.Row="1" x:Name="Busqueda" PlaceholderText="Buscar por nombre o teléfono…"
+                     TextChanged="Busqueda_TextChanged"/>
+            <ListBox Grid.Row="2" x:Name="ListaPropietarios" Classes="ownerList"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     SelectionChanged="ListaPropietarios_SelectionChanged"
+                     DoubleTapped="ListaPropietarios_DoubleTapped">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:Duenio">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="{Binding Nombre}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Telefono}" Classes="caption"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Classes="secondary small" Click="Cancelar_Click">Cancelar</Button>
+                <Button x:Name="SeleccionarButton" Classes="primary small" IsEnabled="False"
+                        Click="Seleccionar_Click">Usar propietario</Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

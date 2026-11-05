@@ -10,6 +10,14 @@ namespace veterinariaInteligente.Service;
 
 public class PdfService
 {
+    static PdfService()
+    {
+        // QuestPDF exige declarar la licencia antes de generar el primer documento.
+        // Community: gratis para particulares, proyectos académicos/open source
+        // y organizaciones con ingresos anuales menores a 1 millón de USD.
+        QuestPDF.Settings.License = LicenseType.Community;
+    }
+
     private readonly AppDbContext _db;
 
     public PdfService(AppDbContext db) => _db = db;
@@ -31,8 +39,12 @@ public class PdfService
                 null);
         }
 
+        var configuracion = await ObtenerConfiguracionAsync();
+
         return GenerarDocumento(
             "Consulta veterinaria",
+            configuracion,
+            consulta.Profesional?.Nombre ?? configuracion?.ProfesionalDefault?.Nombre,
             columna =>
             {
                 AgregarDatosMascota(columna, consulta.Mascota);
@@ -65,8 +77,14 @@ public class PdfService
             .ThenByDescending(c => c.Id)
             .ToListAsync();
 
+        var configuracion = await ObtenerConfiguracionAsync();
+        var veterinario = consultas.FirstOrDefault()?.Profesional?.Nombre
+                          ?? configuracion?.ProfesionalDefault?.Nombre;
+
         return GenerarDocumento(
             "Historial de consultas",
+            configuracion,
+            veterinario,
             columna =>
             {
                 AgregarDatosMascota(columna, mascota);
@@ -114,8 +132,14 @@ public class PdfService
             .ThenByDescending(a => a.Id)
             .ToListAsync();
 
+        var configuracion = await ObtenerConfiguracionAsync();
+        var veterinario = aplicaciones.FirstOrDefault()?.Profesional?.Nombre
+                          ?? configuracion?.ProfesionalDefault?.Nombre;
+
         return GenerarDocumento(
             "Cartilla de vacunación",
+            configuracion,
+            veterinario,
             columna =>
             {
                 AgregarDatosMascota(columna, mascota);
@@ -141,39 +165,125 @@ public class PdfService
 
     private static Resultado<byte[]> GenerarDocumento(
         string titulo,
+        ConfiguracionCliente? configuracion,
+        string? veterinario,
         Action<ColumnDescriptor> contenido)
     {
+        var nombreVeterinaria = string.IsNullOrWhiteSpace(configuracion?.Nombre)
+            ? "Veterinaria"
+            : configuracion.Nombre.Trim();
+        var contacto = string.Join(" · ", new[]
+                { configuracion?.Telefono, configuracion?.Direccion }
+            .Where(valor => !string.IsNullOrWhiteSpace(valor))
+            .Select(valor => valor!.Trim()));
+        var nombreVeterinario = string.IsNullOrWhiteSpace(veterinario)
+            ? "Profesional responsable"
+            : veterinario.Trim();
+
         var documento = Document.Create(contenedor =>
         {
             contenedor.Page(pagina =>
             {
                 pagina.Size(PageSizes.A4);
-                pagina.Margin(40);
+                pagina.MarginHorizontal(42);
+                pagina.MarginVertical(38);
 
                 pagina.DefaultTextStyle(estilo =>
-                    estilo.FontSize(11));
+                    estilo.FontSize(10).FontColor("#263746"));
 
                 pagina.Header()
-                    .PaddingBottom(15)
-                    .Text(titulo)
-                    .FontSize(20)
-                    .SemiBold();
+                    .PaddingBottom(24)
+                    .Background("#0A2E4F")
+                    .PaddingHorizontal(22)
+                    .PaddingVertical(17)
+                    .Row(fila =>
+                    {
+                        fila.RelativeItem().Column(columna =>
+                        {
+                            columna.Item()
+                                .Text(titulo)
+                                .FontSize(19)
+                                .SemiBold()
+                                .FontColor(Colors.White);
+                            columna.Item()
+                                .PaddingTop(4)
+                                .Text("DOCUMENTO CLÍNICO VETERINARIO")
+                                .FontSize(8)
+                                .SemiBold()
+                                .FontColor("#91DCEB");
+                        });
+
+                        fila.ConstantItem(220).AlignRight().Column(columna =>
+                        {
+                            columna.Item()
+                                .AlignRight()
+                                .Text(nombreVeterinaria)
+                                .FontSize(14)
+                                .SemiBold()
+                                .FontColor(Colors.White);
+
+                            if (contacto.Length > 0)
+                                columna.Item()
+                                    .PaddingTop(4)
+                                    .AlignRight()
+                                    .Text(contacto)
+                                    .FontSize(8)
+                                    .FontColor("#D2E2EC");
+                        });
+                    });
 
                 pagina.Content().Column(columna =>
                 {
-                    columna.Spacing(6);
+                    columna.Spacing(7);
                     contenido(columna);
+
+                    columna.Item()
+                        .ExtendVertical()
+                        .AlignBottom()
+                        .PaddingTop(38)
+                        .Row(fila =>
+                        {
+                            fila.RelativeItem();
+                            fila.ConstantItem(290).Column(firma =>
+                            {
+                                firma.Item()
+                                    .LineHorizontal(1)
+                                    .LineColor("#0A2E4F");
+                                firma.Item()
+                                    .PaddingTop(7)
+                                    .AlignCenter()
+                                    .Text(texto =>
+                                    {
+                                        texto.Span("Firma del veterinario  ")
+                                            .SemiBold()
+                                            .FontColor("#0A2E4F");
+                                        texto.Span(nombreVeterinario)
+                                            .FontColor("#526777");
+                                    });
+                            });
+                        });
                 });
 
                 pagina.Footer()
-                    .PaddingTop(15)
-                    .AlignCenter()
-                    .Text(texto =>
+                    .PaddingTop(12)
+                    .BorderTop(1)
+                    .BorderColor("#DCE6ED")
+                    .PaddingTop(8)
+                    .Row(fila =>
                     {
-                        texto.Span("Página ");
-                        texto.CurrentPageNumber();
-                        texto.Span(" de ");
-                        texto.TotalPages();
+                        fila.RelativeItem()
+                            .Text(nombreVeterinaria)
+                            .FontSize(8)
+                            .FontColor("#7A8D9B");
+                        fila.RelativeItem()
+                            .AlignRight()
+                            .Text(texto =>
+                            {
+                                texto.Span("Página ").FontSize(8).FontColor("#7A8D9B");
+                                texto.CurrentPageNumber().FontSize(8).FontColor("#7A8D9B");
+                                texto.Span(" de ").FontSize(8).FontColor("#7A8D9B");
+                                texto.TotalPages().FontSize(8).FontColor("#7A8D9B");
+                            });
                     });
             });
         });
@@ -185,6 +295,13 @@ public class PdfService
             "PDF generado.",
             bytes);
     }
+
+    private Task<ConfiguracionCliente?> ObtenerConfiguracionAsync() =>
+        _db.ConfiguracionesCliente
+            .AsNoTracking()
+            .Include(configuracion => configuracion.ProfesionalDefault)
+            .OrderBy(configuracion => configuracion.Id)
+            .FirstOrDefaultAsync();
 
     private static void AgregarDatosMascota(
         ColumnDescriptor columna,

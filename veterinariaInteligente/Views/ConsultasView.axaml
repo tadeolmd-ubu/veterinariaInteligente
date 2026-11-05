@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:controls="using:veterinariaInteligente.Controls"
              xmlns:models="using:veterinariaInteligente.Models"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
@@ -24,14 +25,15 @@
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="3">
                     <TextBlock Text="Consultas" Classes="sectionTitle"/>
-                    <TextBlock Text="Historial clínico, diagnóstico y tratamiento" Classes="caption"/>
+                    <TextBlock Text="Historial clínico, diagnóstico y tratamiento" Classes="caption"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                     <Button Classes="primary" Command="{Binding NuevaConsultaCommand}">Nueva consulta</Button>
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1" ColumnDefinitions="390,*" ColumnSpacing="22">
+            <controls:ResponsiveTwoPane Grid.Row="1">
 
                 <Border Classes="card" Grid.Column="0" Padding="0">
                     <Grid RowDefinitions="Auto,Auto,Auto,*">
@@ -41,16 +43,16 @@
                         <StackPanel Grid.Row="1" Margin="20,12,20,0" Spacing="10">
                             <TextBox PlaceholderText="Buscar por motivo, mascota o veterinario…"
                                      Text="{Binding BusquedaConsultas}"/>
-                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <WrapPanel ItemSpacing="8" LineSpacing="8">
                                 <Button Classes="chipTab"
                                         Background="{Binding MostrandoArchivadas, Converter={StaticResource TabFondo}, ConverterParameter=Activas}"
                                         Foreground="{Binding MostrandoArchivadas, Converter={StaticResource TabTexto}, ConverterParameter=Activas}"
                                         Command="{Binding VerConsultasActivasCommand}">Activas</Button>
-                                <Button Grid.Column="1" Classes="chipTab"
+                                <Button Classes="chipTab"
                                         Background="{Binding MostrandoArchivadas, Converter={StaticResource TabFondo}, ConverterParameter=Archivadas}"
                                         Foreground="{Binding MostrandoArchivadas, Converter={StaticResource TabTexto}, ConverterParameter=Archivadas}"
                                         Command="{Binding VerConsultasArchivadasCommand}">Archivadas</Button>
-                            </Grid>
+                            </WrapPanel>
                         </StackPanel>
 
                         <TextBlock Grid.Row="2" Text="Selecciona una consulta"
@@ -59,6 +61,7 @@
                         <ListBox Grid.Row="3" Classes="consultasList" Margin="8,6,8,12"
                                  ItemsSource="{Binding ConsultasItems}"
                                  SelectedItem="{Binding SelectedConsulta}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:Consulta">
@@ -101,15 +104,16 @@
 
                         <Border Classes="card">
                             <StackPanel Spacing="16">
-                                <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="10">
                                     <TextBlock Text="Detalle de la consulta" Classes="subsection"/>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                    <WrapPanel ItemSpacing="8" LineSpacing="8" HorizontalAlignment="Right">
+                                        <Button Classes="secondary small" Command="{Binding GenerarConsultaPdfCommand}">Generar PDF</Button>
                                         <Button Classes="primary small" Command="{Binding AgregarConsultaCommand}">Crear</Button>
                                         <Button Classes="secondary small" Command="{Binding RestaurarConsultaCommand}">Restaurar</Button>
                                         <Button Classes="danger small" Command="{Binding ArchivarConsultaCommand}">Archivar</Button>
                                         <Button Classes="primary small" Command="{Binding ActualizarConsultaCommand}">Guardar</Button>
-                                    </StackPanel>
-                                </Grid>
+                                    </WrapPanel>
+                                </StackPanel>
                                 <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="14">
                                     <StackPanel Spacing="5">
                                         <TextBlock Text="Mascota" Classes="fieldLabel"/>
@@ -154,14 +158,14 @@
                                                  AcceptsReturn="True" TextWrapping="Wrap" Height="88"/>
                                     </StackPanel>
                                 </Grid>
-                                <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
                             </StackPanel>
                         </Border>
 
                         <Border Classes="card">
                             <StackPanel Spacing="14">
                                 <TextBlock Text="Historial de la consulta" Classes="subsection"/>
-                                <ItemsControl ItemsSource="{Binding SelectedConsulta.Versiones}">
+                                <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                  <ItemsControl ItemsSource="{Binding SelectedConsulta.Versiones}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="models:ConsultaVersion">
                                             <Border Margin="0,0,8,10" Padding="14,12"
@@ -174,29 +178,32 @@
                                                                    Foreground="{StaticResource InfoBrush}"/>
                                                     </Border>
                                                     <StackPanel Grid.Column="1" Spacing="3">
-                                                        <Grid ColumnDefinitions="*,Auto">
-                                                            <TextBlock Text="{Binding Campo}" FontSize="13" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"/>
-                                                            <TextBlock Grid.Column="1" Text="{Binding Profesional.Nombre}" Classes="caption" VerticalAlignment="Center"/>
+                                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                            <TextBlock Text="{Binding Campo}" FontSize="13" FontWeight="Bold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-Bold.ttf#Nunito Bold"
+                                                                       TextWrapping="Wrap"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding Profesional.Nombre}" Classes="caption" VerticalAlignment="Center"
+                                                                       TextTrimming="CharacterEllipsis"/>
                                                         </Grid>
-                                                        <StackPanel Orientation="Horizontal" Spacing="5">
-                                                            <TextBlock Classes="caption" Text="{Binding ValorAnterior, StringFormat={}{0}}"/>
+                                                        <WrapPanel ItemSpacing="5" LineSpacing="3">
+                                                            <TextBlock Classes="caption" Text="{Binding ValorAnterior, StringFormat={}{0}}" TextWrapping="Wrap"/>
                                                             <TextBlock Classes="caption">→</TextBlock>
                                                             <TextBlock Classes="caption" FontWeight="SemiBold" FontFamily="avares://veterinariaInteligente/Assets/Fonts/Nunito-SemiBold.ttf#Nunito SemiBold"
                                                                        Text="{Binding ValorNuevo}" TextWrapping="Wrap"/>
-                                                        </StackPanel>
+                                                        </WrapPanel>
                                                     </StackPanel>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                  </ItemsControl>
+                                </ScrollViewer>
                             </StackPanel>
                         </Border>
 
                     </StackPanel>
                 </ScrollViewer>
 
-            </Grid>
+            </controls:ResponsiveTwoPane>
         </Grid>
     </Border>
 </UserControl>
