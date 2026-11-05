@@ -7,7 +7,7 @@ using veterinariaInteligente.Service;
 
 namespace veterinariaInteligente.ViewModels;
 
-public partial class PendientesViewModel : ObservableObject
+public partial class PendientesViewModel : OperacionViewModel
 {
     private readonly SeguimientoService? _seguimientos;
     private readonly MascotaService? _mascotas;
@@ -41,7 +41,9 @@ public partial class PendientesViewModel : ObservableObject
     private Seguimiento? selectedSeguimiento;
     [ObservableProperty] private Mascota? selectedMascota;
     [ObservableProperty] private Consulta? selectedConsultaOrigen;
-    [ObservableProperty] private Consulta? selectedConsultaRealizacion;
+    // Compatibilidad temporal con el XAML de Front: ya no participa en el flujo.
+    [Obsolete("Usar únicamente SelectedConsultaOrigen; eliminar el binding en Front.")]
+    public Consulta? SelectedConsultaRealizacion { get => null; set { } }
     [ObservableProperty] private AplicacionVacuna? selectedAplicacionVacunaOrigen;
     [ObservableProperty] private string motivo = string.Empty;
     [ObservableProperty] private string? notas;
@@ -63,7 +65,6 @@ public partial class PendientesViewModel : ObservableObject
     partial void OnSelectedMascotaChanged(Mascota? value)
     {
         SelectedConsultaOrigen = null;
-        SelectedConsultaRealizacion = null;
         SelectedAplicacionVacunaOrigen = null;
         Reemplazar(ConsultasItems, _consultasCargadas.Where(c => c.IdMascota == value?.Id));
         Reemplazar(AplicacionesVacunaItems, _aplicacionesCargadas.Where(a => a.IdMascota == value?.Id));
@@ -79,7 +80,6 @@ public partial class PendientesViewModel : ObservableObject
         FechaRealizada = value.FechaRealizada is { } fecha
             ? new DateTimeOffset(fecha.ToDateTime(TimeOnly.MinValue)) : DateTimeOffset.Now;
         SelectedConsultaOrigen = ConsultasItems.FirstOrDefault(c => c.Id == value.IdConsultaOrigen);
-        SelectedConsultaRealizacion = ConsultasItems.FirstOrDefault(c => c.Id == value.IdConsultaRealizacion);
         SelectedAplicacionVacunaOrigen = AplicacionesVacunaItems.FirstOrDefault(a => a.Id == value.IdAplicacionVacunaOrigen);
     }
 
@@ -96,13 +96,13 @@ public partial class PendientesViewModel : ObservableObject
         if (_seguimientos is null) return;
         if (SelectedMascota is null || FechaPrevista is null)
         {
-            MensajeOperacion = "Seleccioná una mascota y una fecha prevista.";
+            MensajeOperacion = Notificar("Seleccioná una mascota y una fecha prevista.");
             return;
         }
         var resultado = await _seguimientos.AgregarAsync(Motivo,
             DateOnly.FromDateTime(FechaPrevista.Value.Date), Notas, SelectedMascota.Id,
             SelectedConsultaOrigen?.Id, SelectedAplicacionVacunaOrigen?.Id);
-        MensajeOperacion = resultado.Mensaje;
+        MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
         if (resultado.Correcta) await RecargarAsync(resultado.Valor?.Id);
     });
 
@@ -116,12 +116,12 @@ public partial class PendientesViewModel : ObservableObject
             if (_seguimientos is null) return;
             if (FechaPrevista is null)
             {
-                MensajeOperacion = "Seleccioná una fecha prevista.";
+                MensajeOperacion = Notificar("Seleccioná una fecha prevista.");
                 return;
             }
             var resultado = await _seguimientos.ActualizarAsync(id, Motivo,
                 DateOnly.FromDateTime(FechaPrevista.Value.Date), Notas);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             if (resultado.Correcta) await RecargarAsync(id);
         });
     }
@@ -136,12 +136,12 @@ public partial class PendientesViewModel : ObservableObject
             if (_seguimientos is null) return;
             if (FechaRealizada is null)
             {
-                MensajeOperacion = "Seleccioná una fecha de realización.";
+                MensajeOperacion = Notificar("Seleccioná una fecha de realización.");
                 return;
             }
             var resultado = await _seguimientos.MarcarRealizadoAsync(id,
-                DateOnly.FromDateTime(FechaRealizada.Value.Date), SelectedConsultaRealizacion?.Id);
-            MensajeOperacion = resultado.Mensaje;
+                DateOnly.FromDateTime(FechaRealizada.Value.Date), null);
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             if (resultado.Correcta) await RecargarAsync(id);
         });
     }
@@ -155,7 +155,7 @@ public partial class PendientesViewModel : ObservableObject
         {
             if (_seguimientos is null) return;
             var resultado = await _seguimientos.CancelarAsync(id);
-            MensajeOperacion = resultado.Mensaje;
+            MensajeOperacion = Notificar(resultado.Mensaje, resultado.Correcta);
             if (resultado.Correcta) await RecargarAsync(id);
         });
     }
@@ -167,7 +167,6 @@ public partial class PendientesViewModel : ObservableObject
         SelectedSeguimiento = null;
         SelectedMascota = null;
         SelectedConsultaOrigen = null;
-        SelectedConsultaRealizacion = null;
         SelectedAplicacionVacunaOrigen = null;
         Motivo = string.Empty;
         Notas = null;
@@ -210,7 +209,7 @@ public partial class PendientesViewModel : ObservableObject
         if (IsBusy) return;
         IsBusy = true;
         try { await operacion(); }
-        catch (Exception ex) { MensajeOperacion = $"No se pudo completar la operación: {ex.Message}"; }
+        catch (Exception ex) { MensajeOperacion = Notificar($"No se pudo completar la operación: {ex.Message}"); }
         finally { IsBusy = false; }
     }
 

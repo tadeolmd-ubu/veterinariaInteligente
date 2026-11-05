@@ -34,6 +34,18 @@ public class MascotaService
         .ToListAsync();
     }
 
+    // Mascotas archivadas cuyo dueño sigue activo. Las de un dueño archivado
+    // quedan ocultas hasta restaurar al dueño.
+    public async Task<List<Mascota>> ObtenerArchivadasDeDueniosActivosAsync()
+    {
+        return await _db.Mascotas
+            .AsNoTracking()
+            .Include(m => m.Duenio)
+            .Where(m => m.FechaArchivado != null && m.Duenio.FechaArchivado == null)
+            .OrderBy(m => m.Nombre)
+            .ToListAsync();
+    }
+
     public async Task<Mascota?> ObtenerPorIdAsync(int id)
     {
         return await _db.Mascotas

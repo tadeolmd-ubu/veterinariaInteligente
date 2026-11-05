@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:veterinariaInteligente.Styles"
+             xmlns:controls="using:veterinariaInteligente.Controls"
              xmlns:models="using:veterinariaInteligente.Models"
              xmlns:dt="using:veterinariaInteligente.Views.DesignTime"
              mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
@@ -18,19 +19,23 @@
     </UserControl.Resources>
 
     <Border Background="{StaticResource ContentBackgroundBrush}" Padding="28,22">
-        <Grid RowDefinitions="Auto,*" RowSpacing="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20">
 
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="3">
                     <TextBlock Text="Vacunas" Classes="sectionTitle"/>
-                    <TextBlock Text="Catálogo de vacunas y aplicaciones por mascota" Classes="caption"/>
+                    <TextBlock Text="Catálogo de vacunas y aplicaciones por mascota" Classes="caption"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <WrapPanel Grid.Column="1" ItemSpacing="10" LineSpacing="8" VerticalAlignment="Center">
+                    <Button Classes="secondary" Command="{Binding GenerarCartillaPdfCommand}">Generar cartilla PDF</Button>
                     <Button Classes="primary" Command="{Binding NuevaVacunaCommand}">Nueva vacuna</Button>
-                </StackPanel>
+                </WrapPanel>
             </Grid>
 
-            <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="22">
+            <controls:ResponsiveColumnsGrid WideColumns="2" NarrowColumns="1"
+                                            Breakpoint="760" Spacing="22">
 
                 <Border Classes="card" Grid.Column="0" Padding="26,18">
                     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="10">
@@ -45,10 +50,11 @@
 
                         <TextBlock Grid.Row="2" Text="Selecciona una vacuna" Classes="caption"/>
 
-                        <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4"
-                                 ItemsSource="{Binding VacunasItems}"
-                                 SelectedItem="{Binding SelectedVacuna}"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4" MaxHeight="280"
+                                  ItemsSource="{Binding VacunasItems}"
+                                  SelectedItem="{Binding SelectedVacuna}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:Vacuna">
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
@@ -88,14 +94,13 @@
                                          Text="{Binding Descripcion}"
                                          AcceptsReturn="True" TextWrapping="Wrap" Height="64"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
+                            <WrapPanel ItemSpacing="8" LineSpacing="8">
                                 <Button Classes="secondary small" Command="{Binding NuevaVacunaCommand}">Nueva</Button>
                                 <Button Classes="primary small" Command="{Binding AgregarVacunaCommand}">Crear</Button>
                                 <Button Classes="primary small" Command="{Binding ActualizarVacunaCommand}">Guardar</Button>
                                 <Button Classes="danger small" Command="{Binding DesactivarVacunaCommand}">Desactivar</Button>
                                 <Button Classes="primary small" Command="{Binding ActivarVacunaCommand}">Activar</Button>
-                            </StackPanel>
-                            <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
+                            </WrapPanel>
                         </StackPanel>
 
                     </Grid>
@@ -106,8 +111,6 @@
 
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock Text="Aplicaciones" Classes="subsection"/>
-                            <Button Grid.Column="1" Classes="secondary small"
-                                    Command="{Binding NuevaAplicacionCommand}">Aplicar vacuna</Button>
                         </Grid>
 
                         <StackPanel Grid.Row="1" Spacing="5">
@@ -121,10 +124,11 @@
 
                         <TextBlock Grid.Row="2" Text="Selecciona una aplicación" Classes="caption"/>
 
-                        <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4"
-                                 ItemsSource="{Binding AplicacionesItems}"
-                                 SelectedItem="{Binding SelectedAplicacion}"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox Grid.Row="3" Classes="vacunasList" Margin="0,2,0,4" MaxHeight="280"
+                                  ItemsSource="{Binding AplicacionesItems}"
+                                  SelectedItem="{Binding SelectedAplicacion}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:AplicacionVacuna">
                                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
@@ -202,18 +206,18 @@
                                          Text="{Binding Observacion}"
                                          AcceptsReturn="True" TextWrapping="Wrap" Height="56"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
+                            <WrapPanel ItemSpacing="8" LineSpacing="8">
                                 <Button Classes="secondary small" Command="{Binding NuevaAplicacionCommand}">Nueva</Button>
                                 <Button Classes="primary small" Command="{Binding AgregarAplicacionCommand}">Aplicar</Button>
                                 <Button Classes="ghost small" Command="{Binding ActualizarAplicacionCommand}">Guardar</Button>
-                            </StackPanel>
-                            <TextBlock Text="{Binding MensajeOperacion}" Classes="caption"/>
+                            </WrapPanel>
                         </StackPanel>
 
                     </Grid>
                 </Border>
 
-            </Grid>
-        </Grid>
+            </controls:ResponsiveColumnsGrid>
+        </StackPanel>
+        </ScrollViewer>
     </Border>
 </UserControl>
