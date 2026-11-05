@@ -10,6 +10,19 @@ public partial class MainViewModel : OperacionViewModel
     private readonly PropietariosViewModel _propietariosViewModel;
     private readonly CitasViewModel _citasViewModel;
 
+    public string TextoVersionMenu
+    {
+        get
+        {
+            var version = typeof(MainViewModel).Assembly.GetName().Version;
+            var numeroVersion = version is { Build: >= 0 }
+                ? version.ToString(3)
+                : "0.1";
+
+            return $"v{numeroVersion} · PawDesk · GSCode Solutions";
+        }
+    }
+
     public MainViewModel(
         PropietariosViewModel propietariosViewModel,
         CitasViewModel citasViewModel,
