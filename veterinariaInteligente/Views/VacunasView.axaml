@@ -187,13 +187,13 @@
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Spacing="5">
                                     <TextBlock Text="Fecha de aplicación" Classes="fieldLabel"/>
-                                    <DatePicker SelectedDate="{Binding FechaAplicacion}"/>
+                                    <CalendarDatePicker SelectedDate="{Binding FechaAplicacion, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                 </StackPanel>
                             </Grid>
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="Próx. sugerida (opcional)" Classes="fieldLabel"/>
-                                    <DatePicker SelectedDate="{Binding FechaProximaSugerida}"/>
+                                    <CalendarDatePicker SelectedDate="{Binding FechaProximaSugerida, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Spacing="5">
                                     <TextBlock Text="Lote" Classes="fieldLabel"/>

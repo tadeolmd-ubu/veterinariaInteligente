@@ -1,7 +1,9 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="using:veterinariaInteligente.Styles">
 
     <Styles.Resources>
+        <conv:DateTimeOffsetToDateTimeConverter x:Key="DateTimeOffsetToDateTime"/>
         <Color x:Key="BrandCyanColor">#2BC5F0</Color>
         <Color x:Key="BrandTurquoiseColor">#1FBFB3</Color>
         <Color x:Key="NavyColor">#0A2E4F</Color>
@@ -90,10 +92,14 @@
         <Setter Property="Padding" Value="10,8"/>
     </Style>
 
-    <Style Selector="DatePicker">
+    <Style Selector="CalendarDatePicker">
         <Setter Property="FontFamily" Value="avares://veterinariaInteligente/Assets/Fonts/Nunito-Regular.ttf#Nunito"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="SelectedDateFormat" Value="Custom"/>
+        <Setter Property="CustomDateFormatString" Value="dd/MM/yyyy"/>
     </Style>
 
     <Style Selector="Button">

@@ -116,11 +116,11 @@
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Spacing="5">
                                         <TextBlock Text="Fecha prevista" Classes="fieldLabel"/>
-                                        <DatePicker SelectedDate="{Binding FechaPrevista}"/>
+                                        <CalendarDatePicker SelectedDate="{Binding FechaPrevista, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Row="1" Spacing="5">
                                         <TextBlock Text="Fecha de realización" Classes="fieldLabel"/>
-                                        <DatePicker SelectedDate="{Binding FechaRealizada}"/>
+                                        <CalendarDatePicker SelectedDate="{Binding FechaRealizada, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Row="1" Grid.Column="1" Spacing="5">
                                         <TextBlock Text="Origen (opcional)" Classes="fieldLabel"/>

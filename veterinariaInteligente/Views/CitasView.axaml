@@ -44,8 +44,8 @@
                              <StackPanel Spacing="6" IsVisible="{Binding MostrandoAgenda}">
                                  <TextBlock Text="Rango de la agenda" Classes="fieldLabel"/>
                                  <StackPanel Spacing="8">
-                                     <DatePicker SelectedDate="{Binding AgendaDesde}"/>
-                                     <DatePicker SelectedDate="{Binding AgendaHasta}"/>
+                                     <CalendarDatePicker SelectedDate="{Binding AgendaDesde, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
+                                     <CalendarDatePicker SelectedDate="{Binding AgendaHasta, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                      <Button Classes="secondary small" HorizontalAlignment="Stretch"
                                              Command="{Binding CargarAgendaCommand}">Actualizar agenda</Button>
                                  </StackPanel>
@@ -174,7 +174,7 @@
                                     </StackPanel>
                                     <StackPanel Grid.Row="1" Spacing="5">
                                         <TextBlock Text="Fecha prevista" Classes="fieldLabel"/>
-                                        <DatePicker SelectedDate="{Binding FechaPrevista}"/>
+                                        <CalendarDatePicker SelectedDate="{Binding FechaPrevista, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Row="1" Grid.Column="1" Spacing="8">
                                         <TextBlock Text="Estado" Classes="fieldLabel"/>

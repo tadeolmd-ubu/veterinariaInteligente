@@ -166,6 +166,25 @@ public class FechaCortaConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public class DateTimeOffsetToDateTimeConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value switch
+        {
+            DateTimeOffset fecha => fecha.DateTime,
+            DateTime fecha => fecha,
+            _ => null
+        };
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value switch
+        {
+            DateTime fecha => new DateTimeOffset(fecha),
+            DateTimeOffset fecha => fecha,
+            _ => null
+        };
+}
+
 public class VacunaEstadoConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

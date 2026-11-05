@@ -248,7 +248,7 @@
                                             </StackPanel>
                                             <StackPanel Grid.Row="3" Grid.Column="1" Spacing="5">
                                                 <TextBlock Text="Fecha de nacimiento" Classes="fieldLabel"/>
-                                                <DatePicker SelectedDate="{Binding NuevaMascotaFechaNacimiento}"/>
+                                                <CalendarDatePicker SelectedDate="{Binding NuevaMascotaFechaNacimiento, Converter={StaticResource DateTimeOffsetToDateTime}}"/>
                                             </StackPanel>
                                         </Grid>
                                         <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
