@@ -86,8 +86,22 @@ internal static class UpdateService
                 $robocopyOutput = ''
                 try {
                     Wait-Process -Id $AppProcessId -ErrorAction SilentlyContinue
-                    $robocopyOutput = (& robocopy $Source $Destination /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm 2>&1 | Out-String)
-                    $robocopyExitCode = $LASTEXITCODE
+                    $robocopyInfo = New-Object System.Diagnostics.ProcessStartInfo
+                    $robocopyInfo.FileName = Join-Path $env:SystemRoot 'System32\robocopy.exe'
+                    $robocopyInfo.Arguments = ('"{0}" "{1}" /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm' -f $Source, $Destination)
+                    $robocopyInfo.UseShellExecute = $false
+                    $robocopyInfo.CreateNoWindow = $true
+                    $robocopyInfo.RedirectStandardOutput = $true
+                    $robocopyInfo.RedirectStandardError = $true
+                    $robocopyProcess = New-Object System.Diagnostics.Process
+                    $robocopyProcess.StartInfo = $robocopyInfo
+                    [void]$robocopyProcess.Start()
+                    $stdoutTask = $robocopyProcess.StandardOutput.ReadToEndAsync()
+                    $stderrTask = $robocopyProcess.StandardError.ReadToEndAsync()
+                    $robocopyProcess.WaitForExit()
+                    $robocopyExitCode = $robocopyProcess.ExitCode
+                    $robocopyOutput = $stdoutTask.Result + $stderrTask.Result
+                    $robocopyProcess.Dispose()
                     $robocopyOutput | Set-Content -Path $robocopyLog
                     if ($robocopyExitCode -ge 8) {
                         throw "Robocopy falló con código $robocopyExitCode."
