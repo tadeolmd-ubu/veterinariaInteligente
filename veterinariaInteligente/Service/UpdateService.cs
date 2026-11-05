@@ -83,10 +83,12 @@ internal static class UpdateService
                 $ErrorActionPreference = 'Stop'
                 $robocopyExitCode = 'No ejecutado'
                 $robocopyLog = Join-Path $PSScriptRoot 'robocopy.log'
+                $robocopyOutput = ''
                 try {
                     Wait-Process -Id $AppProcessId -ErrorAction SilentlyContinue
-                    & robocopy $Source $Destination /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm "/LOG:$robocopyLog"
+                    $robocopyOutput = (& robocopy $Source $Destination /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm 2>&1 | Out-String)
                     $robocopyExitCode = $LASTEXITCODE
+                    $robocopyOutput | Set-Content -Path $robocopyLog
                     if ($robocopyExitCode -ge 8) {
                         throw "Robocopy falló con código $robocopyExitCode."
                     }
@@ -97,11 +99,14 @@ internal static class UpdateService
                         "Origen: $Source"
                         "Destino: $Destination"
                         "Código de Robocopy: $robocopyExitCode"
+                        'Salida de Robocopy:'
+                        $robocopyOutput
+                        'Error del instalador:'
                         ''
                         ($_ | Out-String)
                     ) | Set-Content -Path (Join-Path $PSScriptRoot 'error.log')
                     Add-Type -AssemblyName PresentationFramework
-                    [System.Windows.MessageBox]::Show("No se pudo instalar la actualización. Revisa error.log y robocopy.log en:`n$PSScriptRoot", 'Error de actualización')
+                    [System.Windows.MessageBox]::Show("No se pudo instalar la actualización. Revisa error.log (incluye la salida de Robocopy) en:`n$PSScriptRoot", 'Error de actualización')
                 }
                 """);
             var start = new ProcessStartInfo
