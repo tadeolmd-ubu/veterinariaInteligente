@@ -81,46 +81,44 @@ internal static class UpdateService
             await File.WriteAllTextAsync(script, """
                 param([int]$AppProcessId, [string]$Source, [string]$Destination)
                 $ErrorActionPreference = 'Stop'
-                $robocopyExitCode = 'No ejecutado'
-                $robocopyLog = Join-Path $PSScriptRoot 'robocopy.log'
-                $robocopyOutput = ''
+                $copiedFileCount = 0
+                $currentFile = 'Ninguno'
                 try {
                     Wait-Process -Id $AppProcessId -ErrorAction SilentlyContinue
-                    $robocopyInfo = New-Object System.Diagnostics.ProcessStartInfo
-                    $robocopyInfo.FileName = Join-Path $env:SystemRoot 'System32\robocopy.exe'
-                    $robocopyInfo.Arguments = ('"{0}" "{1}" /E /IS /R:10 /W:2 /XF *.db *.db-wal *.db-shm' -f $Source, $Destination)
-                    $robocopyInfo.UseShellExecute = $false
-                    $robocopyInfo.CreateNoWindow = $true
-                    $robocopyInfo.RedirectStandardOutput = $true
-                    $robocopyInfo.RedirectStandardError = $true
-                    $robocopyProcess = New-Object System.Diagnostics.Process
-                    $robocopyProcess.StartInfo = $robocopyInfo
-                    [void]$robocopyProcess.Start()
-                    $stdoutTask = $robocopyProcess.StandardOutput.ReadToEndAsync()
-                    $stderrTask = $robocopyProcess.StandardError.ReadToEndAsync()
-                    $robocopyProcess.WaitForExit()
-                    $robocopyExitCode = $robocopyProcess.ExitCode
-                    $robocopyOutput = $stdoutTask.Result + $stderrTask.Result
-                    $robocopyProcess.Dispose()
-                    $robocopyOutput | Set-Content -Path $robocopyLog
-                    if ($robocopyExitCode -ge 8) {
-                        throw "Robocopy falló con código $robocopyExitCode."
+                    $sourceRoot = [System.IO.Path]::GetFullPath($Source)
+                    if (-not $sourceRoot.EndsWith('\')) { $sourceRoot += '\' }
+                    $destinationRoot = [System.IO.Path]::GetFullPath($Destination)
+                    if (-not $destinationRoot.EndsWith('\')) { $destinationRoot += '\' }
+                    foreach ($file in [System.IO.Directory]::GetFiles($sourceRoot, '*', [System.IO.SearchOption]::AllDirectories)) {
+                        $fileName = [System.IO.Path]::GetFileName($file)
+                        if ($fileName -like '*.db' -or $fileName -like '*.db-wal' -or $fileName -like '*.db-shm') {
+                            continue
+                        }
+
+                        $currentFile = $file
+                        $relativePath = $file.Substring($sourceRoot.Length)
+                        $targetFile = Join-Path $destinationRoot $relativePath
+                        $targetDirectory = [System.IO.Path]::GetDirectoryName($targetFile)
+                        [System.IO.Directory]::CreateDirectory($targetDirectory) | Out-Null
+                        [System.IO.File]::Copy($file, $targetFile, $true)
+                        $copiedFileCount++
                     }
+
+                    $currentFile = 'Ninguno'
                     Start-Process -FilePath (Join-Path $Destination 'veterinariaInteligente.exe') -WorkingDirectory $Destination
                     Remove-Item $PSScriptRoot -Recurse -Force -ErrorAction SilentlyContinue
                 } catch {
                     @(
                         "Origen: $Source"
                         "Destino: $Destination"
-                        "Código de Robocopy: $robocopyExitCode"
-                        'Salida de Robocopy:'
-                        $robocopyOutput
+                        "Archivos copiados antes del fallo: $copiedFileCount"
+                        "Archivo en proceso: $currentFile"
                         'Error del instalador:'
                         ''
                         ($_ | Out-String)
                     ) | Set-Content -Path (Join-Path $PSScriptRoot 'error.log')
                     Add-Type -AssemblyName PresentationFramework
-                    [System.Windows.MessageBox]::Show("No se pudo instalar la actualización. Revisa error.log (incluye la salida de Robocopy) en:`n$PSScriptRoot", 'Error de actualización')
+                    [System.Windows.MessageBox]::Show("No se pudo instalar la actualización. Revisa error.log en:`n$PSScriptRoot", 'Error de actualización')
                 }
                 """);
             var start = new ProcessStartInfo
